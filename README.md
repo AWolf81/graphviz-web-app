@@ -1,6 +1,14 @@
-# graphviz-vue-app
+# Graphviz App with Vue.js
 
 > Graphviz editor & rendering app with live updating.
+
+## Todos
+
+- [ ] Fix exporting with pan & zoom (pan & zoom disabled at the moment)
+- [ ] Push to github pages
+- [ ] Add feature list to readme
+- [ ] Add format selection setting (stored in localstorage)
+- [ ] Add export to text (see viz.js demo page)
 
 ## Build Setup
 
