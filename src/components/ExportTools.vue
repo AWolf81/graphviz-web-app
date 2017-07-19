@@ -1,30 +1,42 @@
 <template lang="html">
-  <div>
-    <div v-if="showExportSettings" class="settings-panel">
-      <label>Scale</label>
-      <input v-model="scale" type="number" min="0.1"/>
-      <span>Exported image size (w x h): {{ displaySize() }}</span>
-    </div>
-  <div class="btn-group navbar-btn navbar-right">
-    <button class="btn btn-default"
-      @click="showExportSettings = !showExportSettings">
-        <span class="glyphicon glyphicon-wrench" aria-hidden="true"></span>
-        Settings</button>
-    <button class="btn btn-default" @click="savePNG" aria-label="Left Align">
-      <span class="glyphicon glyphicon-floppy-disk" aria-hidden="true"></span>
-      <span class="label label-default">(png)</span></button>
-      <button class="btn btn-default" @click="saveSVG"aria-label="Left Align">
-        <span class="glyphicon glyphicon-floppy-disk" aria-hidden="true"></span>
-        <span class="label label-default">(svg)</span></button>
+  <div class="navbar-right">
+      <div class="btn-group" :class="{open: showExportSettings}"
+        v-on-clickaway="hideDropdown">
+        <button class="btn btn-default dropdown-toggle navbar-btn" type="button" @click="showExportSettings = !showExportSettings">
+          <span class="glyphicon glyphicon-wrench" aria-hidden="true"></span>
+          Settings <span class="caret"></span></button>
+        </button>
+        <div class="dropdown-menu"  v-if="showExportSettings" :aria-expanded="showExportSettings">
+          <div class="form-group">
+              <label label-for="scale-input">Scale <small>(only raster image)</small></label>
+              <input id="scale-input" v-model="scale" type="number" min="0" step="0.5"/>
+          </div>
+          <small>Exported image size (w x h):<br/>{{ displaySize() }}</small>
+
+        </div>
+      </div>
+      <div class="btn-group">
+        <button class="btn btn-default navbar-btn" @click="savePNG" aria-label="Left Align">
+          <span class="glyphicon glyphicon-floppy-disk" aria-hidden="true"></span>
+            <!-- <span class="label label-default">(png)</span> -->
+            (PNG)
+          </button>
+          <button class="btn btn-default navbar-btn" @click="saveSVG"aria-label="Left Align">
+            <span class="glyphicon glyphicon-floppy-disk" aria-hidden="true"></span>
+            <!-- <span class="label label-default">(svg)</span> -->
+            (SVG)
+          </button>
       </div>
     </div>
-    </template>
+</template>
 
     <script>
     import {saveSvgAsPng, saveSvg} from 'save-svg-as-png'
     import {mapState} from 'vuex'
+    import {mixin as clickaway} from 'vue-clickaway'
 
     export default {
+      mixins: [clickaway],
       data () {
         return {
           showExportSettings: false,
@@ -53,9 +65,13 @@
         }
       },
       methods: {
+        hideDropdown () {
+          console.log('hide')
+          this.showExportSettings = false
+        },
         displaySize () {
-          let width = (this.scale * this.size.width).toFixed(2)
-          let height = (this.scale * this.size.height).toFixed(2)
+          let width = Math.round(this.scale * this.size.width)
+          let height = Math.round(this.scale * this.size.height)
           return `${width} x ${height} px`
         },
         savePNG () {
@@ -103,12 +119,7 @@
       pointer-events: none;
     }
 
-    .settings-panel {
-      position: absolute;
-      width: 10em;
-      
-      background-color: gray;
-      border-radius: 5px;
-      z-index: 10;
+    .dropdown-menu {
+      padding: 1em;
     }
     </style>

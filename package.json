@@ -26,6 +26,7 @@
     "viz.js": "^1.8.0",
     "vue": "^2.3.3",
     "vue-bootstrap-modal": "^0.1.13",
+    "vue-clickaway": "^2.1.0",
     "vue-codemirror": "^3.0.8",
     "vue-ls": "^2.2.18",
     "vue-router": "^2.3.1",

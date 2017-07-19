@@ -46,6 +46,10 @@
                 <div class="navbar-header">
                   <a class="navbar-brand">Render</a>
                 </div>
+                <!-- <div class="btn-group navbar-right">
+                  <button type="button" name="button" class="btn btn-default navbar-btn">1</button>
+                  <button type="button" name="button" class="btn btn-default navbar-btn">2</button>
+                </div> -->
                 <export-tools></export-tools>
               </div>
             </nav>
