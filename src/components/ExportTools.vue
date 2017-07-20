@@ -9,34 +9,41 @@
         <div class="dropdown-menu"  v-if="showExportSettings" :aria-expanded="showExportSettings">
           <div class="form-group">
               <label label-for="scale-input">Scale <small>(only raster image)</small></label>
-              <input id="scale-input" v-model="scale" type="number" min="0" step="0.5"/>
+              <input id="scale-input" v-model.number="scale" @keyup="scaleChanged" @change="scaleChanged" type="number" min="0" step="0.5"/>
           </div>
           <small>Exported image size (w x h):<br/>{{ displaySize() }}</small>
 
         </div>
       </div>
-      <div class="btn-group">
-        <button class="btn btn-default navbar-btn" @click="savePNG" aria-label="Left Align">
+      <div class="btn-group save-buttons">
+        <button title="save as png" class="btn btn-default navbar-btn" @click="savePNG" aria-label="Left Align">
           <span class="glyphicon glyphicon-floppy-disk" aria-hidden="true"></span>
             <!-- <span class="label label-default">(png)</span> -->
-            (PNG)
+            <span class="save-button-label">(PNG)</span>
           </button>
-          <button class="btn btn-default navbar-btn" @click="saveSVG"aria-label="Left Align">
+          <button title="save as svg" class="btn btn-default navbar-btn" @click="saveSVG"aria-label="Left Align">
             <span class="glyphicon glyphicon-floppy-disk" aria-hidden="true"></span>
             <!-- <span class="label label-default">(svg)</span> -->
-            (SVG)
+            <span class="save-button-label">(SVG)</span>
           </button>
       </div>
     </div>
 </template>
 
     <script>
+    import _ from 'lodash'
     import {saveSvgAsPng, saveSvg} from 'save-svg-as-png'
     import {mapState} from 'vuex'
     import {mixin as clickaway} from 'vue-clickaway'
 
     export default {
       mixins: [clickaway],
+      created () {
+        let storedSetting = this.$ls.get('settings')
+        if (storedSetting) {
+          this.scale = storedSetting.scale
+        }
+      },
       data () {
         return {
           showExportSettings: false,
@@ -74,6 +81,14 @@
           let height = Math.round(this.scale * this.size.height)
           return `${width} x ${height} px`
         },
+        scaleChanged: _.debounce(function () {
+          console.log('save new scale debouced')
+          // save scale in localstorage
+          // later saved related to current url id/name
+          this.$ls.set('settings', { // todo add object assign later for more settings
+            scale: this.scale
+          })
+        }, 400),
         savePNG () {
           // this.$store.commit('disableControls')
           // this.$store.commit('resetZoom')
@@ -121,5 +136,20 @@
 
     .dropdown-menu {
       padding: 1em;
+    }
+
+    .save-button-label {
+        position: relative;
+        display: inline-block;
+        font-size: 0.5em;
+        margin-left: -0.5em;
+        /*top: -1.5em;*/
+        background-color: #d4d6e9;
+        color: black;
+        padding: 0.2em;
+        border-radius: 0.4em;
+        /*transform: rotate(-45deg);
+        transform-origin: 0;*/
+        /*opacity: 0.8;*/
     }
     </style>
