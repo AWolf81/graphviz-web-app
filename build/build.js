@@ -5,6 +5,7 @@ process.env.NODE_ENV = 'production'
 var ora = require('ora')
 var rm = require('rimraf')
 var path = require('path')
+var publish = require('./publish')
 var chalk = require('chalk')
 var webpack = require('webpack')
 var config = require('../config')
@@ -31,5 +32,7 @@ rm(path.join(config.build.assetsRoot, config.build.assetsSubDirectory), err => {
       '  Tip: built files are meant to be served over an HTTP server.\n' +
       '  Opening index.html over file:// won\'t work.\n'
     ))
+
+    publish(); // publish to gh-pages
   })
 })
