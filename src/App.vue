@@ -1,5 +1,5 @@
 <template>
-  <div id="app" class="container">
+  <div id="app">
     <!-- <img src="./assets/logo.png"> -->
     <router-view :key="$route.path"></router-view>
   </div>
@@ -14,6 +14,8 @@ export default {
 <style lang="scss">
 $icon-font-path: '~bootstrap-sass/assets/fonts/bootstrap/';
 @import '~bootstrap-sass/assets/stylesheets/_bootstrap.scss';
+
+body { padding-top: 65px; }
 
 textarea {
   width: 100%;

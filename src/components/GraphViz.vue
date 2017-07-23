@@ -1,22 +1,22 @@
 <template lang="html">
-  <div>
-    <h1>Graphviz App</h1>
-    <div class="container">
-      <h4>
-        Examples
-      </h4>
+  <div class="container-fluid">
+      <div class="row">
+        <div class="col-xs-12">
+          <!-- <h4>
+            Examples
+          </h4> -->
 
-      <div class="btn-group" role="group" aria-label="Example selection bar">
-        <!-- <button type="button" class="btn btn-default" @click="show(index)" v-for="(example, index) in examples"> -->
-        <router-link class="btn btn-xs btn-default" :to="'/example/' + index" v-for="(example, index) in examples" :key="'example-link' + index">
-          {{example.caption}}
-        </router-link>
+          <!-- <div class="btn-group" role="group" aria-label="Example selection bar">
+            <router-link class="btn btn-xs btn-default" :to="'/example/' + index" v-for="(example, index) in examples" :key="'example-link' + index">
+              {{example.caption}}
+            </router-link>
+          </div> -->
+          <!-- <local-graph-storage :graphs="storedGraphs" @show="showStored" @remove="removeGraph"></local-graph-storage> -->
+        </div>
       </div>
-      <local-graph-storage :graphs="storedGraphs" @show="showStored" @remove="removeGraph"></local-graph-storage>
-
-      <hr/>
-      <div v-if="!loaded">
-        <spinner></spinner>
+        <!-- <hr/> -->
+        <div v-if="!loaded">
+          <spinner></spinner>
       </div>
       <div class="row" v-if="loaded">
         <div class="col-md-4">
@@ -28,8 +28,8 @@
               <div class="btn-group navbar-btn navbar-right" role="group" aria-label="toolbar">
                 <button type="button" @click="clear()" title="Clear graph data input" class="btn btn-small btn-default">
                   <span class="glyphicon glyphicon-trash"></span></button>
-                  <button type="button" :disabled="!dotData"
-                  :title="!dotData? 'Nothing to save!': 'Save your graph in browser'"
+                  <button type="button" :disabled="!localDotData"
+                  :title="!localDotData? 'Nothing to save!': 'Save your graph in browser'"
                   @click="showSave=true" class="btn btn-small btn-default">
                   <span class="glyphicon glyphicon-floppy-disk" aria-hidden="true"></span></button>
                 </div>
@@ -38,9 +38,9 @@
             <div v-if="renderErrorMessage!=''" class="render-error"><small>{{renderErrorMessage}}</small>
             </div>
             <!-- <textarea class="form-control" v-model="dotData"></textarea> -->
-            <codemirror v-model="dotData" :options="editorOption" @ready="onEditorReady"></codemirror>
+            <codemirror :value="localDotData" @change="updateDot" :options="editorOption" @ready="onEditorReady"></codemirror>
           </div>
-          <div class="col-md-8">
+          <div class="col-md-8" :class="{maximize: isMaximizedRender}">
             <nav class="navbar navbar-default">
               <div class="container-fluid">
                 <div class="navbar-header">
@@ -50,16 +50,17 @@
                   <button type="button" name="button" class="btn btn-default navbar-btn">1</button>
                   <button type="button" name="button" class="btn btn-default navbar-btn">2</button>
                 </div> -->
+                <button class="btn btn-default navbar-btn" @click="toggleSize" title="Toggle size"><i :class="`glyphicon ${isMaximizedRender? 'glyphicon-resize-small': 'glyphicon-resize-full'}`"></i></button>
                 <export-tools></export-tools>
               </div>
             </nav>
             <graph-viz-render
-              :dot-data="dotData"
+              :dot-data="localDotData"
               @error="updateError"></graph-viz-render>
           </div>
         </div>
-        <footer>Examples from <a href="http://www.graphviz.org/Gallery.php" target="_blank">http://www.graphviz.org/Gallery.php</a></footer>
-      </div>
+        <!-- <footer>Examples from <a href="http://www.graphviz.org/Gallery.php" target="_blank">http://www.graphviz.org/Gallery.php</a></footer> -->
+      <!-- </div> -->
 
       <modal :show.sync="showClear" @cancel="cancel" @ok="ok">
         <h4 slot="header">Clear editor</h4>
@@ -98,10 +99,10 @@ Are you sure to clear the editor? (no undo)
 <script>
 import Vue from 'vue'
 import axios from 'axios'
+import {mapState, mapMutations} from 'vuex'
+import _ from 'lodash'
 import { codemirror } from 'vue-codemirror'
-
 import { examples } from './../App.constants'
-import localGraphStorage from './LocalGraphStorage.vue'
 import graphVizRender from './GraphVizRender.vue'
 import exportTools from './ExportTools.vue'
 import modal from './Modal.vue'
@@ -134,33 +135,33 @@ export default {
       saveName: undefined,
       saveReady: false,
       controlIconsEnabled: true,
-      dotData:
-      `digraph {
-        node [shape=box]; ## changes all nodes
-        a [shape=doublecircle]; ## changes only a
-        ## a to b with -> as the connection
-        a -> b;
-        ## b to c and back to a
-        b -> c -> a;
-      }`,
+      // localDotData: '',
       storedGraphs: [],
-      examples,
       editorOption: {
         tabSize: 2,
         gutters: ['CodeMirror-linenumbers', 'markers'],
         viewportMargin: Infinity
-      }
+      },
+      isMaximizedRender: false
     }
   },
   components: {
     graphVizRender,
-    localGraphStorage,
     modal,
     codemirror,
     exportTools,
     spinner
   },
+  computed: {
+    ...mapState({
+      localDotData: (state) => state.dotData
+    }),
+    ...mapState(['storedGraphs'])
+  },
   watch: {
+    // localDotData: _.debounce(() => {
+    //   this.$store.commit('updateDotData', this.localDotData)
+    // }, 500),
     renderErrorMessage () {
       let line = parseInt(this.renderErrorMessage.match(/\d+/))
 
@@ -175,12 +176,16 @@ export default {
     }
   },
   mounted () {
-    console.log('graphviz editor', this.$editor)
-    this.loadStorage()
+    console.log('graphviz editor', this.$editor, this.$route)
+    // this.loadStorage()
     this.setData()
     console.log(this.$route, this) // todo check if id passed & route example
   },
   methods: {
+    ...mapMutations([
+      'updateDotData'
+    ]),
+    updateDot: _.debounce(function (data) { this.updateDotData(data) }, 500),
     onEditorReady () {
       this.$editor = document.querySelector('.CodeMirror')
     },
@@ -210,45 +215,56 @@ export default {
       return marker
     },
     setData () {
-      if (this.$route.name !== 'Home') {
-        // not home --> check if index exists and render
-        let index = this.$route.params.index
-        let example = this.examples[index]
+      // if (this.$route.name !== 'Home') {
+      // not home --> check if index exists and render
+      let index = this.$route.params.index
+      let example = examples[index]
 
-        if (!isNaN(index)) {
-          // numeric value --> example from index
-          if (example.data) {
-            this.dotData = example.data
+      if (!isNaN(index)) {
+        // numeric value --> example from index
+        if (example.data) {
+          this.localDotData = example.data
+          this.loaded = true
+        } else {
+          this.loadData(example.url).then(data => {
+            this.localDotData = data
+            this.loaded = true
+          })
+        }
+      } else {
+        let url = this.$route.query.url
+        console.log('load from url', url)
+        if (url) {
+          // defined but a string --> use url params to load data
+          console.log(this.$route)
+          this.loadData(url).then(data => {
+            this.localDotData = data
+            this.loaded = true
+          }).catch((err) => {
+            this.errorMessage = err.message
+            this.showError = true
+          })
+        } else {
+          if (this.$route.name === 'Home') {
+            this.localDotData = this.$store.state.dotData // initial load data
             this.loaded = true
           } else {
-            this.loadData(example.url).then(data => {
-              this.dotData = data
-              this.loaded = true
-            })
-          }
-        } else {
-          let url = this.$route.query.url
-          console.log('load from url', url)
-          if (url) {
-            // defined but a string --> use url params to load data
-            console.log(this.$route)
-            this.loadData(url).then(data => {
-              this.dotData = data
-              this.loaded = true
-            }).catch((err) => {
-              this.errorMessage = err.message
-              this.showError = true
-            })
-          } else {
-            // show error later
+            // show error
             this.errorMessage = "Couldn't load data. Please check your url."
             this.showError = true
           }
         }
-      } else {
-        // home route --> set loaded to display editors
-        this.loaded = true
       }
+      // } else {
+      //   // home route --> set loaded to display editors
+      //   this.loaded = true
+      // }
+    },
+    toggleSize () {
+      this.isMaximizedRender = !this.isMaximizedRender
+      setTimeout(() =>
+        this.$store.commit('updateSVGSize', document.querySelector('svg').getBBox())
+      , 0)
     },
     // render error updating
     updateError (error) {
@@ -263,9 +279,9 @@ export default {
       return axios.get(`https://crossorigin.me/${url}`)
       .then((response) => response.data)
     },
-    loadStorage () {
-      this.storedGraphs = this.$ls.get('storedGraphs') || []
-    },
+    // loadStorage () {
+    //   this.storedGraphs = this.$ls.get('storedGraphs') || []
+    // },
     clear () {
       // show modal
       console.log('clear clicked')
@@ -273,7 +289,7 @@ export default {
       console.log(this.showClear)
     },
     ok () {
-      this.dotData = ''
+      this.localDotData = ''
       this.showClear = false
     },
     cancel () {
@@ -296,40 +312,14 @@ export default {
       this.showSave = false
     },
     save (name) {
-      let graph = this.storedGraphs.filter((graph) => graph.name === name)
-
-      if (graph.length > 0) {
-        // override graph
-        let index = this.storedGraphs.indexOf(graph[0])
-        this.storedGraphs[index].data = this.dotData
-      } else {
-        // new graph
-        this.storedGraphs.push({
-          name,
-          id: this.storedGraphs.length,
-          createdAt: Date.now(),
-          data: this.dotData
-        })
-      }
-
-      Vue.ls.set('storedGraphs', this.storedGraphs)
-    },
-    showStored (data) {
-      this.dotData = data
-    },
-    removeGraph (graph) {
-      let index = this.storedGraphs.indexOf(graph)
-      if (index === -1) return // not in list
-
-      this.storedGraphs.splice(index, 1) // remove
-      this.$ls.set('storedGraphs', this.storedGraphs) // update storage
+      this.$store.commit('saveGraph', name)
     }
     /* show (index) {
     let data = this.examples[index].data
     if (!data) {
     let example = this.examples[index] // short hand
     this.loadData(example.url).then((loadedData) => {
-    this.dotData = loadedData
+    this.localDotData = loadedData
     this.loaded = true
   })
 } else {
@@ -342,6 +332,7 @@ this.loaded = true
 </script>
 
 <style lang="css">
+
 .navbar-default {
   margin-bottom: 0;
 }
@@ -380,5 +371,17 @@ a.router-link-active, li.router-link-active a {
   text-align: center;
   color: #a94442;
   margin-top: -20px;
+}
+
+.maximize {
+  position: absolute;
+  left: 0;
+  top: 65px;
+  bottom: 0;
+  width: 100%;
+  /*width: 100vw;
+  height: 100vh;*/
+  z-index: 100;
+  background-color: white;
 }
 </style>

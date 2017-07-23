@@ -27,12 +27,13 @@
             <span class="save-button-label">(SVG)</span>
           </button>
       </div>
+      <div id="debug">
+      </div>
     </div>
 </template>
 
     <script>
     import _ from 'lodash'
-    import {saveSvgAsPng, saveSvg} from 'save-svg-as-png'
     import {mapState} from 'vuex'
     import {mixin as clickaway} from 'vue-clickaway'
 
@@ -54,11 +55,8 @@
       computed: {
         ...mapState({
           controlsVisible: (state) => state.panZoom.controlsVisible
-        }),
-        size () {
-          let svg = document.querySelector('svg')
-          return svg.getBBox()
-        }
+          // size: (state) => state.panZoom.size
+        })
       },
       watch: {
         controlsVisible () {
@@ -77,8 +75,11 @@
           this.showExportSettings = false
         },
         displaySize () {
-          let width = Math.round(this.scale * this.size.width)
-          let height = Math.round(this.scale * this.size.height)
+          let svg = document.querySelector('svg') // .graph')
+          let size = svg.getClientRects()[0]
+          console.log('display size', size, this.scale, svg.getClientRects())
+          let width = this.scale * Math.trunc(size.width)
+          let height = this.scale * Math.trunc(size.height)
           return `${width} x ${height} px`
         },
         scaleChanged: _.debounce(function () {
@@ -90,20 +91,31 @@
           })
         }, 400),
         savePNG () {
+          console.log(this.$store)
+          this.$store.dispatch('saveAsPng', this.scale)
           // this.$store.commit('disableControls')
           // this.$store.commit('resetZoom')
-
-          let svg = document.querySelector('svg')
-          let bBox = svg.getBBox()
-          let scale = this.scale
-          let exportSvg = svg.cloneNode(true) // .cloneNode(true)
-          // svg.setAttribute('transform', 'scale(3)')
-          exportSvg.setAttribute('width', bBox.width * scale)
-          exportSvg.setAttribute('height', bBox.height * scale)
-          exportSvg.setAttribute('viewBox', `0 0 ${bBox.width * scale} ${bBox.height * scale}`)
-          exportSvg.setAttribute('transform', `scale(${scale})`)
-          console.log(exportSvg)
-          saveSvgAsPng(exportSvg, 'diagram.png')
+          // // let graph = document.querySelector('.graph')
+          // // let svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
+          // // svg.appendChild(graph)
+          //
+          // let svg = document.querySelector('svg')
+          // let bBox = svg.getBBox()
+          // // let scale = this.scale
+          // let exportSvg = svg.cloneNode(true) // .cloneNode(true)
+          // // svg.setAttribute('transform', 'scale(3)')
+          // /*
+          // exportSvg.setAttribute('width', bBox.width * scale)
+          // exportSvg.setAttribute('height', bBox.height * scale)
+          // exportSvg.setAttribute('viewBox', `0 0 ${bBox.width * scale} ${bBox.height * scale}`)
+          // exportSvg.setAttribute('transform', `scale(${scale})`)
+          // */
+          // console.log('export svg', exportSvg, svg, bBox)
+          //
+          // // let exportTest = document.querySelector('#debug')
+          // // exportTest.appendChild(exportSvg)
+          // saveSvgAsPng(exportSvg, 'diagram.png')
+          // this.$store.commit('enableControls')
           // this.saveCb = function () {
           //   let svg = document.querySelector('svg')
           //   let exportFrame = document.querySelector('exportFrame')
@@ -114,13 +126,20 @@
           // this.saveCb()
         },
         saveSVG () {
-          saveSvg(document.querySelector('svg'), 'diagram.svg')
+          // saveSvg(document.querySelector('svg'), 'diagram.svg')
+          this.$store.dispatch('saveAsSvg')
         }
       }
     }
     </script>
 
     <style lang="css" scoped>
+    #debug {
+      position: absolute;
+      top: 500;
+      left: 0;
+      z-index: 1000;
+    }
     .exportFrame {
       position: fixed;
       top: 0px;

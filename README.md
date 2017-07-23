@@ -2,13 +2,29 @@
 
 > Graphviz editor & rendering app with live updating.
 
-## Todos
+Live demo is online here https://graphviz-app.surge.sh
 
-- [ ] Fix exporting with pan & zoom (pan & zoom disabled at the moment)
-- [ ] Push to github pages
-- [ ] Add feature list to readme
-- [ ] Add format selection setting (stored in localstorage)
-- [ ] Add export to text (see viz.js demo page)
+To learn more about graphviz please have a look at http://www.graphviz.org/.
+
+## Todos
+- [ ] Add about page - showing current version + some resource links
+- [x] Fix exporting with pan & zoom (pan & zoom disabled at the moment)
+- [ ] Improve size calculation at Export settings (sometimes wrong size)
+- [x] Push to ~~github pages~~ surge.sh
+- [x] Add feature list to readme
+- [ ] Add format selection setting (stored in localstorage) currently only dot rendering supported
+- [ ] Add download dot input text (see viz.js demo page)
+- [ ] Add copy dot to clipboard
+- [ ] Add drafting feature - every new page will be automatically saved as draft + autosave every 30 seconds
+
+## Features
+- Render graph with two-way binding (no render click required)
+- Example graphs
+- Save dot text in localstorage
+- Pan & Zoom (not implented yet)
+- Export as PNG (with scaling) & SVG
+- Settings saved in localstorage (just scale setting, more settings later)
+- Drafting feature (similar to jsfiddle drafts)
 
 ## Build Setup
 
