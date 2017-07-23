@@ -136,7 +136,6 @@ export default {
       saveReady: false,
       controlIconsEnabled: true,
       // localDotData: '',
-      storedGraphs: [],
       editorOption: {
         tabSize: 2,
         gutters: ['CodeMirror-linenumbers', 'markers'],
@@ -223,11 +222,13 @@ export default {
       if (!isNaN(index)) {
         // numeric value --> example from index
         if (example.data) {
-          this.localDotData = example.data
+          // this.localDotData = example.data
+          this.updateDotData(example.data)
           this.loaded = true
         } else {
           this.loadData(example.url).then(data => {
-            this.localDotData = data
+            // this.localDotData = data
+            this.updateDotData(data)
             this.loaded = true
           })
         }
@@ -289,7 +290,8 @@ export default {
       console.log(this.showClear)
     },
     ok () {
-      this.localDotData = ''
+      // this.localDotData = ''
+      this.updateDotData('')
       this.showClear = false
     },
     cancel () {

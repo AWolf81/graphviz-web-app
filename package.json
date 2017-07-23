@@ -1,6 +1,6 @@
 {
   "name": "graphviz-vue-app",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Graphviz editor & rendering app with live updating.",
   "author": "AWolf81 <awolf2904@gmail.com>",
   "private": true,
