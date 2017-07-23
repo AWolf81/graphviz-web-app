@@ -26,10 +26,12 @@ export default {
     render (data) {
       try {
         this.$el.innerHTML = Viz(data) // , this.config)
-        this.$store.commit('createPanZoom')
-        this.$store.commit('updateSVGSize',
-          document.querySelector('svg').getBBox())
         this.$emit('error', '')
+        this.$store.commit('createPanZoom')
+        if (document.querySelector('svg')) {
+          this.$store.commit('updateSVGSize',
+          document.querySelector('svg').getBBox())
+        }
       } catch (err) {
         // render error to label later
         console.log('error', err.message)
