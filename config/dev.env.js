@@ -7,5 +7,5 @@ const versionString = childProcess.execSync('git describe --abbrev=0 --tags')[0]
 
 module.exports = merge(prodEnv, {
   NODE_ENV: '"development"',
-  version: '"0.1.1"' // + commitCount + '"' // fix later
+  version: '"0.1.2"' // + commitCount + '"' // fix later
 })
