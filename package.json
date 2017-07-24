@@ -1,5 +1,5 @@
 {
-  "name": "graphviz-vue-app",
+  "name": "draw-viz-app",
   "version": "0.1.1",
   "description": "Graphviz editor & rendering app with live updating.",
   "author": "AWolf81 <awolf2904@gmail.com>",
@@ -9,7 +9,7 @@
     "start": "node build/dev-server.js",
     "build": "node build/build.js",
     "pre-deploy": "npm run build",
-    "deploy": "surge --domain graphviz-app.surge.sh",
+    "deploy": "surge --domain drawviz.surge.sh",
     "unit": "cross-env BABEL_ENV=test karma start test/unit/karma.conf.js --single-run",
     "e2e": "node test/e2e/runner.js",
     "test": "npm run unit && npm run e2e",

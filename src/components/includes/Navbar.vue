@@ -9,7 +9,7 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <router-link active-class="" to="/" class="navbar-brand">GraphvizApp</router-link>
+      <router-link active-class="" to="/" class="navbar-brand">DrawViz</router-link>
     </div>
 
     <!-- Collect the nav links, forms, and other content for toggling -->
