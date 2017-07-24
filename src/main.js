@@ -6,6 +6,10 @@ import router from './router'
 import VueLs from 'vue-ls'
 import store from './store'
 
+// load spinner css
+require('../node_modules/spinkit/css/spinners/8-circle.css')
+require('./assets/main.css') // load styling before Vue bootstrapped
+
 Vue.config.productionTip = false
 
 Vue.use(VueLs)

@@ -1,7 +1,7 @@
 <template lang="html">
   <li v-if="graphs.length > 0" class="dropdown" :class="{open: showLoadDropdown}">
     <a href="#" @click="showLoadDropdown = !showLoadDropdown"class="dropdown-toggle" title="Load from localstorage">Load <span class="caret"></span></a>
-    <ul class="dropdown-menu" id="style-4" v-if="showLoadDropdown" v-on-clickaway="() => {showLoadDropdown = false}">
+    <ul class="dropdown-menu" id="scrollbar-style" v-if="showLoadDropdown" v-on-clickaway="() => {showLoadDropdown = false}">
       <li v-for="graph in graphs">
         <div class="media">
           <h4 class="media-heading">{{graph.name}}</h4>
@@ -30,6 +30,12 @@ export default {
       return moment(date).format('YYYY-MM-DD HH:m:s')
     },
     show (data) {
+      if (this.$route.name !== 'Home') {
+        console.log('redirect', this.$route.name)
+        // ensure that we're having the correct view
+        this.$router.push('/')
+      }
+
       this.$store.commit('updateDotData', data)
       this.showLoadDropdown = false
     }
@@ -51,21 +57,22 @@ export default {
 
   /*
  *  STYLE 4
+ *  from this codepen https://codepen.io/devstreak/pen/dMYgeO
  */
 
-#style-4::-webkit-scrollbar-track
+#scrollbar::-webkit-scrollbar-track
 {
 	-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
 	background-color: #F5F5F5;
 }
 
-#style-4::-webkit-scrollbar
+#scrollbar::-webkit-scrollbar
 {
 	width: 4px;
 	background-color: #F5F5F5;
 }
 
-#style-4::-webkit-scrollbar-thumb
+#scrollbar::-webkit-scrollbar-thumb
 {
 	background-color: #000000;
 	border: 2px solid #555555;

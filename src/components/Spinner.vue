@@ -21,5 +21,6 @@ export default {
 </script>
 
 <style lang="scss">
- @import '~spinkit/scss/spinners/8-circle'
+// spinner style loaded globally --> first visible style
+// @import '~spinkit/scss/spinners/8-circle';
 </style>

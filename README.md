@@ -2,12 +2,12 @@
 
 > Graphviz editor & rendering app with live updating.
 
-Live demo is online here https://graphviz-app.surge.sh
+Live demo is online here https://drawviz.surge.sh
 
 To learn more about graphviz please have a look at http://www.graphviz.org/.
 
 ## Todos
-- [ ] Add about page - showing current version + some resource links
+- [x] Add about page - showing current version + some resource links
 - [x] Fix exporting with pan & zoom (pan & zoom disabled at the moment)
 - [ ] Improve size calculation at Export settings (sometimes wrong size)
 - [x] Push to ~~github pages~~ surge.sh

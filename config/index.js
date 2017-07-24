@@ -1,9 +1,25 @@
 // see http://vuejs-templates.github.io/webpack for documentation.
+var childProcess = require('child_process')
 var path = require('path')
+var merge = require('webpack-merge')
+
+// const commitCount = childProcess.execSync('git rev-list HEAD --count').toString()
+const versionStringFull = childProcess.execSync('git for-each-ref refs/tags --sort=-taggerdate --format=\'%(refname)\' --count=1').toString()
+const version = (versionStringFull.split('/') || ['0.0.0']).pop()
+  .replace(/'\s+/, '')
+
+console.log(versionStringFull, version)
+
+var baseEnv = {
+  version: '"' + version + '"'
+}
 
 module.exports = {
   build: {
-    env: require('./prod.env'),
+    env: merge(
+      baseEnv,
+      require('./prod.env')
+    ),
     index: path.resolve(__dirname, '../dist/index.html'),
     assetsRoot: path.resolve(__dirname, '../dist'),
     assetsSubDirectory: 'static',
@@ -23,7 +39,9 @@ module.exports = {
     bundleAnalyzerReport: process.env.npm_config_report
   },
   dev: {
-    env: require('./dev.env'),
+    env: merge(baseEnv,
+      require('./dev.env')
+    ),
     port: 8080,
     autoOpenBrowser: true,
     assetsSubDirectory: 'static',
