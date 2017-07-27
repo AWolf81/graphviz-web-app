@@ -104,7 +104,19 @@ export default {
       // panZoom.fit()
       // panZoom.center()
       // register resize handler
-      window.onresize = onResize
+      function isVisible () {
+        console.log(document.querySelector('.navbar-collapse').offsetParent !== null)
+        return document.querySelector('.navbar-collapse').offsetParent !== null
+      }
+
+      window.onresize = function () {
+        onResize() // pan zoom related
+
+        console.log('resized - visible?', isVisible())
+        store.commit('updateNavCollapseInactive', !isVisible())
+      }
+      // initial setup (laysout related)
+      store.commit('updateNavCollapseInactive', !isVisible())
     },
     updateSVGSize (state, size) {
       state.size = size

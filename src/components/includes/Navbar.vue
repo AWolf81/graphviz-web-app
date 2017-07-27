@@ -13,8 +13,9 @@
     </div>
 
     <!-- Collect the nav links, forms, and other content for toggling -->
-   <transition name="slide" enter-active-class="collapse collapsing" active-leave-class="collapse collapsing">
-    <div class="navbar-collapse" :class="{'collapse in': showCollapsedNav}" id="bs-example-navbar-collapse-1" v-if="showCollapsedNav" :aria-expanded="showCollapsedNav">
+   <!-- <transition name="slide" enter-active-class="collapse collapsing" active-leave-class="collapse collapsing"> -->
+    <!-- fix collapsing -->
+    <div class="navbar-collapse" :class="{'collapse in': showCollapsedNav}" id="bs-example-navbar-collapse-1" v-show="showCollapsedNav || collapseInactive" :aria-expanded="showCollapsedNav">
       <ul class="nav navbar-nav">
         <!-- <li class="active"><a href="#">Link <span class="sr-only">(current)</span></a></li>-->
         <!-- <li><a href="#">Link</a></li> -->
@@ -54,7 +55,7 @@
         </li>
       </ul>
     </div><!-- /.navbar-collapse -->
-  </transition>
+  <!-- </transition> -->
   </div><!-- /.container-fluid -->
 </nav>
 </template>
@@ -74,7 +75,7 @@ export default {
     localGraphStorage
   },
   computed: {
-    ...mapState(['storedGraphs'])
+    ...mapState(['storedGraphs', 'collapseInactive'])
   },
   data () {
     return {

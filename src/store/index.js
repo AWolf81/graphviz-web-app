@@ -19,7 +19,8 @@ export default new Vuex.Store({
       ## b to c and back to a
       b -> c -> a;
     }`,
-    storedGraphs: Vue.ls.get('storedGraphs') || []
+    storedGraphs: Vue.ls.get('storedGraphs') || [],
+    collapseInactive: true
   },
   mutations: {
     updateDotData (state, dot) {
@@ -50,6 +51,9 @@ export default new Vuex.Store({
 
       state.storedGraphs.splice(index, 1) // remove
       Vue.ls.set('storedGraphs', state.storedGraphs) // update storage
+    },
+    updateNavCollapseInactive (state, inactive) {
+      state.collapseInactive = inactive
     }
   }
 })
