@@ -21,11 +21,11 @@
       <div class="row" v-if="loaded">
         <div class="col-md-4">
           <nav class="navbar navbar-default">
-            <div class="container-fluid">
-              <div class="navbar-header">
+              <div class="navbar-header pull-left">
                 <a class="navbar-brand">Definition</a>
               </div>
-              <div class="btn-group navbar-btn navbar-right" role="group" aria-label="toolbar">
+              <div class="navbar-header pull-right">
+              <div class="btn-group navbar-btn" role="group" aria-label="toolbar">
                 <button type="button" @click="clear()" title="Clear graph data input" class="btn btn-small btn-default">
                   <span class="glyphicon glyphicon-trash"></span></button>
                   <button type="button" :disabled="!localDotData"
@@ -42,17 +42,18 @@
           </div>
           <div class="col-md-8" :class="{maximize: isMaximizedRender}">
             <nav class="navbar navbar-default">
-              <div class="container-fluid">
-                <div class="navbar-header">
-                  <a class="navbar-brand">Render</a>
+                <div class="navbar-header pull-left">
+                  <a class="navbar-brand">Render
+                  </a>
+                  <button class="btn btn-default btn-xs navbar-btn" @click="toggleSize" title="Toggle size"><i :class="`glyphicon ${isMaximizedRender? 'glyphicon-resize-small': 'glyphicon-resize-full'}`"></i></button>
                 </div>
                 <!-- <div class="btn-group navbar-right">
                   <button type="button" name="button" class="btn btn-default navbar-btn">1</button>
                   <button type="button" name="button" class="btn btn-default navbar-btn">2</button>
                 </div> -->
-                <button class="btn btn-default navbar-btn" @click="toggleSize" title="Toggle size"><i :class="`glyphicon ${isMaximizedRender? 'glyphicon-resize-small': 'glyphicon-resize-full'}`"></i></button>
-                <export-tools></export-tools>
-              </div>
+                <div class="navbar-header pull-right">
+                  <export-tools></export-tools>
+                </div>
             </nav>
             <graph-viz-render
               :dot-data="localDotData"

@@ -1,6 +1,6 @@
 <template lang="html">
   <footer>
-    Version {{env.version}} - 
+    Version {{env.version}} -
     This app is very alpha and may change completely at any time. If you're having important graphs keep a copy of your definition in a save place.
   </footer>
 </template>

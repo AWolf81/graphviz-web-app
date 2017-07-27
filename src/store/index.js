@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import VueLs from 'vue-ls'
 import Vuex from 'vuex'
-import panZoom from './modules/PanZoom'
+import panZoom from './modules/panzoom'
 
 Vue.use(Vuex)
 Vue.use(VueLs)

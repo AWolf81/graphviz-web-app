@@ -3,7 +3,7 @@
   <div class="container-fluid">
     <!-- Brand and toggle get grouped for better mobile display -->
     <div class="navbar-header">
-      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+      <button type="button" class="navbar-toggle" :class="{collapsed: !showCollapsedNav}" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" @click="showCollapsedNav = !showCollapsedNav" :aria-expanded="showCollapsedNav">
         <span class="sr-only">Toggle navigation</span>
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
@@ -13,7 +13,8 @@
     </div>
 
     <!-- Collect the nav links, forms, and other content for toggling -->
-    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+   <transition name="slide" enter-active-class="collapse collapsing" active-leave-class="collapse collapsing">
+    <div class="navbar-collapse" :class="{'collapse in': showCollapsedNav}" id="bs-example-navbar-collapse-1" v-if="showCollapsedNav" :aria-expanded="showCollapsedNav">
       <ul class="nav navbar-nav">
         <!-- <li class="active"><a href="#">Link <span class="sr-only">(current)</span></a></li>-->
         <!-- <li><a href="#">Link</a></li> -->
@@ -53,6 +54,7 @@
         </li>
       </ul>
     </div><!-- /.navbar-collapse -->
+  </transition>
   </div><!-- /.container-fluid -->
 </nav>
 </template>
@@ -62,6 +64,7 @@ import {mixin as clickaway} from 'vue-clickaway'
 import {mapState} from 'vuex'
 import { examples } from '../../App.constants'
 import localGraphStorage from '@/components/LocalGraphStorage.vue'
+import Headroom from 'headroom.js'
 
 export default {
   mixins: [
@@ -75,9 +78,11 @@ export default {
   },
   data () {
     return {
+      headroom: undefined,
       examples,
       showExampleDropdown: false,
-      showHelpDropdown: false
+      showHelpDropdown: false,
+      showCollapsedNav: false
     }
   },
   methods: {
@@ -87,9 +92,32 @@ export default {
     removeGraph (graph) {
       this.$store.commit('removeGraph', graph)
     }
+  },
+  mounted () {
+    // grab an element
+    let navbar = document.querySelector('.navbar')
+    // construct an instance of Headroom, passing the element
+    this.headroom = new Headroom(navbar)
+    // initialise
+    this.headroom.init()
   }
 }
 </script>
 
-<style lang="css">
+<style lang="scss">
+/**
+ * Note: I have omitted any vendor-prefixes for clarity.
+ * Adding them is left as an exercise for the reader.
+ */
+.headroom {
+    will-change: transform;
+    transition: transform 200ms linear;
+}
+.headroom--pinned {
+    transform: translateY(0%);
+}
+.headroom--unpinned {
+    transform: translateY(-100%);
+}
+
 </style>

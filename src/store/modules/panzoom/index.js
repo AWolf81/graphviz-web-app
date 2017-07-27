@@ -1,6 +1,8 @@
 import svgPanZoom from 'svg-pan-zoom'
-import store from '../index.js'
+import store from '@/store'
 import {saveSvgAsPng, saveSvg} from 'save-svg-as-png'
+
+import eventsHandler from './EventsHandler'
 
 function onResize () {
   console.log('resized')
@@ -94,7 +96,8 @@ export default {
         center: true,
         minZoom: 0.1,
         onZoom: onZoom,
-        onPan: onPan
+        onPan: onPan,
+        customEventsHandler: eventsHandler
       })
       //
       panZoom.resize() // update SVG cached size and controls positions

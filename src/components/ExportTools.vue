@@ -1,10 +1,10 @@
 <template lang="html">
-  <div class="navbar-right">
+  <div>
       <div class="btn-group" :class="{open: showExportSettings}"
         v-on-clickaway="hideDropdown">
-        <button class="btn btn-default dropdown-toggle navbar-btn" type="button" @click="showExportSettings = !showExportSettings">
+        <button class="btn btn-default navbar-btn" type="button" @click="showExportSettings = !showExportSettings">
           <span class="glyphicon glyphicon-wrench" aria-hidden="true"></span>
-          Settings <span class="caret"></span></button>
+          <span class="hidden-xs">Settings <span class="caret"></span></span></button>
         </button>
         <div class="dropdown-menu"  v-if="showExportSettings" :aria-expanded="showExportSettings">
           <div class="form-group">
@@ -14,8 +14,8 @@
           <small>Exported image size (w x h):<br/>{{ displaySize() }}</small>
 
         </div>
-      </div>
-      <div class="btn-group save-buttons">
+      <!-- </div>
+      <div class="btn-group save-buttons"> -->
         <button title="save as png" class="btn btn-default navbar-btn" @click="savePNG" aria-label="Left Align">
           <span class="glyphicon glyphicon-floppy-disk" aria-hidden="true"></span>
             <!-- <span class="label label-default">(png)</span> -->
@@ -133,7 +133,9 @@
     }
     </script>
 
-    <style lang="css" scoped>
+    <style lang="scss" scoped>
+    @import '~bootstrap-sass/assets/stylesheets/bootstrap/mixins/buttons';
+
     #debug {
       position: absolute;
       top: 500;
@@ -171,4 +173,22 @@
         transform-origin: 0;*/
         /*opacity: 0.8;*/
     }
+
+/* Portrait and Landscape */
+    // @media (screen)
+    //   and (device-width: 320px)
+    //   and (device-height: 640px)
+    //   and (-webkit-device-pixel-ratio: 2) {
+    //     .btn-responsive {
+    //       /*button-size($padding-vertical, $padding-horizontal, $font-size, $line-height, $border-radius)*/
+    //       @include button-size(1px, 5px, 12px, 1.5, 3px);
+    //     }
+    // }
+
+    // @media (screen)
+    //   and (max-width: 640px) {
+    //   .btn-responsive {
+    //     @include button-size(6px, 12px, 14px, 1.42857, 4px);
+    //   }
+    // }
     </style>

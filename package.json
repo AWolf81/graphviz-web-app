@@ -1,6 +1,6 @@
 {
   "name": "draw-viz-app",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "Graphviz editor & rendering app with live updating.",
   "author": "AWolf81 <awolf2904@gmail.com>",
   "private": true,
@@ -18,6 +18,8 @@
   "dependencies": {
     "axios": "^0.16.2",
     "bootstrap-sass": "^3.3.7",
+    "hammerjs": "^2.0.8",
+    "headroom.js": "^0.9.4",
     "lodash": "^4.17.4",
     "moment": "^2.18.1",
     "node-sass": "^4.5.3",
