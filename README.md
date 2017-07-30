@@ -9,19 +9,19 @@ To learn more about graphviz please have a look at http://www.graphviz.org/.
 ## Todos
 - [x] Add about page - showing current version + some resource links
 - [x] Fix exporting with pan & zoom (pan & zoom disabled at the moment)
-- [ ] Improve size calculation at Export settings (sometimes wrong size)
+- [x] Improve size calculation at Export settings (sometimes wrong size)
 - [x] Push to ~~github pages~~ surge.sh
 - [x] Add feature list to readme
 - [ ] Add format selection setting (stored in localstorage) currently only dot rendering supported
-- [ ] Add download dot input text (see viz.js demo page)
+- [x] Add download dot input text (see viz.js demo page)
 - [ ] Add copy dot to clipboard
-- [ ] Add drafting feature - every new page will be automatically saved as draft + autosave every 30 seconds
+- [x] Add drafting feature - every new page will be automatically saved as draft + autosave (could be improved by reducing save freq. - at the moment every change will be save)
 
 ## Features
 - Render graph with two-way binding (no render click required)
 - Example graphs
 - Save dot text in localstorage
-- Pan & Zoom (not implented yet)
+- Pan & Zoom
 - Export as PNG (with scaling) & SVG
 - Settings saved in localstorage (just scale setting, more settings later)
 - Drafting feature (similar to jsfiddle drafts)
