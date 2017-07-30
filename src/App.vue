@@ -14,8 +14,11 @@ export default {
 <style lang="scss">
 $icon-font-path: '~bootstrap-sass/assets/fonts/bootstrap/';
 @import '~bootstrap-sass/assets/stylesheets/_bootstrap.scss';
+@import "~nanoscroller/bin/css/nanoscroller.css";
 
-body { padding-top: 65px; }
+$spacing: 8px; // spacing between render and definition
+
+body { padding-top: 60px; }
 
 textarea {
   width: 100%;
@@ -33,6 +36,29 @@ footer {
   padding-bottom: 0.5em;
 }
 
+.col-md-4 {
+  padding-left: $spacing;
+  padding-right: $spacing;
+  padding-bottom: $spacing;
+}
+.col-md-8 {
+  padding-left: 0;
+  padding-right: $spacing;
+}
+
+.nano {
+  /*background: #bba; */
+  height: 300px;
+}
+.nano > .nano-content { padding: 10px; }
+.nano > .nano-pane   {
+  background: #e1f5fe;
+  width: 5px;
+}
+.nano > .nano-pane > .nano-slider {
+  background: #467a93;
+  /*#111; */
+}
 /*#app {
   font-family: 'Avenir', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;

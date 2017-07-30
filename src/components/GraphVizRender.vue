@@ -66,5 +66,8 @@ export default {
 svg {
   width: 100%;
   height: 75vh;
+  background-color: #fff;
 }
+
+
 </style>

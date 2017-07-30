@@ -1,3 +1,5 @@
+export const DEFAULT_CODEMIRROR_THEME = 'default'
+export const DEFAULT_EXPORT_NAME = 'diagram'
 export const examples = [
   {
     id: 0,

@@ -16,7 +16,7 @@ export default new Router({
       component: AppLayout,
       children: [
         {
-          path: '/',
+          path: '/:slug?',
           name: 'Home',
           component: Graphviz,
           meta: { reuse: false }
@@ -31,9 +31,10 @@ export default new Router({
           meta: { reuse: false }
         },
         {
-          path: '/about',
+          path: '/i/about',
           name: 'About',
-          component: About
+          component: About,
+          meta: { reuse: false }
         }
       ]
     }

@@ -1,23 +1,12 @@
 <template lang="html">
   <div class="container-fluid">
-      <div class="row">
-        <div class="col-xs-12">
-          <!-- <h4>
-            Examples
-          </h4> -->
-
-          <!-- <div class="btn-group" role="group" aria-label="Example selection bar">
-            <router-link class="btn btn-xs btn-default" :to="'/example/' + index" v-for="(example, index) in examples" :key="'example-link' + index">
-              {{example.caption}}
-            </router-link>
-          </div> -->
-          <!-- <local-graph-storage :graphs="storedGraphs" @show="showStored" @remove="removeGraph"></local-graph-storage> -->
-        </div>
-      </div>
-        <!-- <hr/> -->
-        <div v-if="!loaded">
-          <spinner></spinner>
-      </div>
+      <spinner v-if="!loaded"></spinner>
+      <alert v-if="loaded" id="appInfo" alert-type="cookie-info-alert">
+        <strong>DrawViz</strong> is using Graphviz to create a graph from a specification written as text. <br/>
+            It's like markdown but for creating graphs.
+            Check-out the links <router-link to="/about">here</router-link> or the examples to learn more about it.
+          <p><small>This app is using cookies for user traffic tracking. By closing this message you're accepting the usage. Don't like tracking - click <a href="javascript:gaDisableTracking()">here</a> to disable.</small></p>
+      </alert>
       <div class="row" v-if="loaded">
         <div class="col-md-4">
           <nav class="navbar navbar-default">
@@ -30,8 +19,19 @@
                   <span class="glyphicon glyphicon-trash"></span></button>
                   <button type="button" :disabled="!localDotData"
                   :title="!localDotData? 'Nothing to save!': 'Save your graph in browser'"
-                  @click="showSave=true" class="btn btn-small btn-default">
+                  @click="openSave()" class="btn btn-small btn-default">
                   <span class="glyphicon glyphicon-floppy-disk" aria-hidden="true"></span></button>
+                  <dropdown tag="button" trigger-tag="span" class="btn btn-small btn-default dropdown-toggle">
+                    <span slot="trigger"
+                    title="Save as"
+                    class="glyphicon glyphicon-floppy-disk"
+                    aria-hidden="true">...</span>
+                    <ul class="list-group dropdown-menu">
+                      <a href="#" class="list-group-item" @click="saveTxt">
+                        Download textfile
+                      </a>
+                    </ul>
+                  </dropdown>
                 </div>
               </div>
             </nav>
@@ -39,6 +39,11 @@
             </div>
             <!-- <textarea class="form-control" v-model="dotData"></textarea> -->
             <codemirror :value="localDotData" @change="updateDot" :options="editorOption" @ready="onEditorReady"></codemirror>
+            <nav class="navbar navbar-default" role="navigation">
+              <ul class="nav navbar-nav">
+                <theme-select></theme-select>
+              </ul>
+            </nav>
           </div>
           <div class="col-md-8" :class="{maximize: isMaximizedRender}">
             <nav class="navbar navbar-default">
@@ -91,6 +96,11 @@
   <h4 slot="header">Error occured</h4>
   <p slot="body">{{errorMessage}}</p>
 </modal>
+
+<modal :show="showDelete" @cancel="cancelDelete" @ok="deleteGraph">
+  <h4 slot="header">Delete graph</h4>
+  <p slot="body">Are you sure to delete <strong>{{graphToDelete ? graphToDelete.name : ''}}</strong>? (no undo possible)</p>
+</modal>
 <!-- <modal title="Clear editor" :show.sync="showClear" @ok="ok" @cancel="cancel">
 Are you sure to clear the editor? (no undo)
 </modal> -->
@@ -103,11 +113,16 @@ import axios from 'axios'
 import {mapState, mapMutations} from 'vuex'
 import _ from 'lodash'
 import { codemirror } from 'vue-codemirror'
+import themeSelect from './CodeMirrorThemeSelect.vue'
 import { examples } from './../App.constants'
+import dropdown from './Dropdown'
 import graphVizRender from './GraphVizRender.vue'
 import exportTools from './ExportTools.vue'
 import modal from './Modal.vue'
 import spinner from './Spinner.vue'
+import alert from './Alert.vue'
+
+import '@/helpers/loadCodemirrorThemes.js'
 
 Vue.directive('focus', {
   // When the bound element is inserted into the DOM...
@@ -136,6 +151,7 @@ export default {
       saveName: undefined,
       saveReady: false,
       controlIconsEnabled: true,
+      currentTheme: '',
       // localDotData: '',
       editorOption: {
         tabSize: 2,
@@ -146,22 +162,28 @@ export default {
     }
   },
   components: {
+    alert,
+    codemirror,
+    dropdown,
+    exportTools,
     graphVizRender,
     modal,
-    codemirror,
-    exportTools,
-    spinner
+    spinner,
+    themeSelect
   },
   computed: {
     ...mapState({
       localDotData: (state) => state.dotData
     }),
-    ...mapState(['storedGraphs'])
+    ...mapState(['editorTheme', 'filename', 'graphToDelete', 'storedGraphs', 'showDelete'])
   },
   watch: {
     // localDotData: _.debounce(() => {
     //   this.$store.commit('updateDotData', this.localDotData)
     // }, 500),
+    editorTheme () {
+      this.setTheme(this.editorTheme)
+    },
     renderErrorMessage () {
       let line = parseInt(this.renderErrorMessage.match(/\d+/))
 
@@ -183,24 +205,39 @@ export default {
   },
   methods: {
     ...mapMutations([
-      'updateDotData'
+      'updateGraphData'
     ]),
-    updateDot: _.debounce(function (data) { this.updateDotData(data) }, 500),
+    cancelDelete () {
+      this.$store.commit('hideDeleteConfirm')
+    },
+    setTheme (theme) {
+      // editor maybe not ready here (first set in onEditorReady)
+      if (this.$editor) {
+        this.$editor.setOption('theme', this.editorTheme)
+      }
+    },
+    deleteGraph () {
+      this.$store.dispatch('triggerRemoveGraph')
+    },
+    updateDot: _.debounce(function (data) { this.updateGraphData({data: data}) }, 500),
     onEditorReady () {
-      this.$editor = document.querySelector('.CodeMirror')
+      this.$editor = document.querySelector('.CodeMirror').CodeMirror
+
+      console.log('editor ready', this.$editor)
+      this.$editor.setOption('theme', this.editorTheme)
     },
     clearGutter (name) {
-      this.$editor.CodeMirror.clearGutter(name)
+      this.$editor.clearGutter(name)
     },
     highlightLine (lineNumber) {
       // Line number is zero based index
       let actualLineNumber = lineNumber - 1
 
       // Select the first item (zero index) just incase more than one found & get the CodeMirror JS object
-      let codeMirrorEditor = this.$editor.CodeMirror
+      let codeMirrorEditor = this.$editor
 
       // Write the item to the console window, for debugging
-      console.log(this.$editor.CodeMirror, actualLineNumber)
+      console.log(this.$editor, actualLineNumber)
 
       this.clearGutter('markers') // clear previous marker
 
@@ -214,6 +251,20 @@ export default {
       marker.innerHTML = `<span title="${this.renderErrorMessage}">●</span>`
       return marker
     },
+    saveTxt () {
+      this.setFilename()
+      let element = document.createElement('a')
+      element.setAttribute('href', 'data:text/plain;charset=utf-8,' +
+        encodeURIComponent(this.localDotData.replace(/([^\r])\n/g, '$1\r\n')))
+      element.setAttribute('download', (this.saveName || 'dotdata') + '.txt')
+
+      element.style.display = 'none'
+      document.body.appendChild(element)
+
+      element.click()
+
+      document.body.removeChild(element)
+    },
     setData () {
       // if (this.$route.name !== 'Home') {
       // not home --> check if index exists and render
@@ -224,18 +275,19 @@ export default {
         // numeric value --> example from index
         if (example.data) {
           // this.localDotData = example.data
-          this.updateDotData(example.data)
+          this.updateGraphData({data: example.data})
           this.loaded = true
         } else {
           this.loadData(example.url).then(data => {
             // this.localDotData = data
-            this.updateDotData(data)
+            this.updateGraphData({data})
             this.loaded = true
           })
         }
       } else {
+        // not a name
         let url = this.$route.query.url
-        console.log('load from url', url)
+        // console.log('load from url', url)
         if (url) {
           // defined but a string --> use url params to load data
           console.log(this.$route)
@@ -248,7 +300,16 @@ export default {
           })
         } else {
           if (this.$route.name === 'Home') {
-            this.localDotData = this.$store.state.dotData // initial load data
+            // console.log('home route', this.$route)
+            if (this.$route.params.slug) {
+              let graph = this.storedGraphs
+                .filter((graph) => graph.slug === (this.$route.params.slug))[0]
+              this.localDotData = graph.data
+              this.$store.commit('updateGraphData', graph)
+              // console.log('loaded graph', graph)
+            } else {
+              this.localDotData = this.$store.state.dotData // initial load data
+            }
             this.loaded = true
           } else {
             // show error
@@ -261,6 +322,14 @@ export default {
       //   // home route --> set loaded to display editors
       //   this.loaded = true
       // }
+    },
+    openSave () {
+      this.setFilename()
+      this.showSave = true
+    },
+    setFilename () {
+      this.saveName = this.filename
+      console.log('set filename', this.filename, this.saveName)
     },
     toggleSize () {
       this.isMaximizedRender = !this.isMaximizedRender
@@ -292,8 +361,9 @@ export default {
     },
     ok () {
       // this.localDotData = ''
-      this.updateDotData('')
+      this.updateGraphData({data: '', name: ''})
       this.showClear = false
+      this.$router.push('/')
     },
     cancel () {
       // clear cancelled
@@ -339,6 +409,11 @@ this.loaded = true
 .navbar-default {
   margin-bottom: 0;
 }
+
+/*.dropdown-menu {
+  overflow: hidden;
+  height: 300px;
+}*/
 
 .navbar .btn-group {
   padding-right: 0.5em;

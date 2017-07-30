@@ -27,18 +27,28 @@
             <span class="save-button-label">(SVG)</span>
           </button>
       </div>
-      <div id="debug">
+      <div id="exportSVG" class="">
       </div>
     </div>
 </template>
 
     <script>
     import _ from 'lodash'
-    import {mapState} from 'vuex'
     import {mixin as clickaway} from 'vue-clickaway'
-
+    import {saveSvgAsPng, saveSvg} from 'save-svg-as-png'
+    // import {saveSvg} from 'save-svg-as-png'
+    import { DEFAULT_EXPORT_NAME } from '@/App.constants'
     export default {
       mixins: [clickaway],
+      computed: {
+        name () {
+          // console.log('name', this.$route, this.$route.path.length)
+          // if there is no name in path just '/' -- fallback to default name
+          return this.$route.path.length > 1
+            ? this.$route.path.replace('/', '')
+            : DEFAULT_EXPORT_NAME
+        }
+      },
       created () {
         let storedSetting = this.$ls.get('settings')
         if (storedSetting) {
@@ -52,32 +62,43 @@
           scale: 2.0
         }
       },
-      computed: {
-        ...mapState({
-          controlsVisible: (state) => state.panZoom.controlsVisible
-          // size: (state) => state.panZoom.size
-        })
-      },
-      watch: {
-        controlsVisible () {
-          console.log('controlsVisible changed', this.controlsVisible, this.saveCb)
-          if (this.saveCb && !this.controlsVisible) {
-            console.log('watch triggered')
-            this.saveCb()
-            // this.$store.commit('enableControls')
-            // this.$store.commit('restoreZoom')
-          }
-        }
-      },
       methods: {
+        createExportSvg () {
+          let graph = document.querySelector('.graph').cloneNode(true) // svg
+          let svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
+          svg.appendChild(graph)
+
+          let exportArea = document.querySelector('#exportSVG svg')
+          if (!exportArea) {
+            document.querySelector('#exportSVG').appendChild(svg)
+          } else {
+            exportArea.replaceWith(svg)
+          }
+          let graphBox = graph.getBoundingClientRect() // .getClientRects()[0] // getBBox()
+          console.log('graphbox', graphBox)
+          svg.setAttribute('width', this.scale * graphBox.width)
+          svg.setAttribute('height', this.scale * graphBox.height)
+          svg.setAttribute('viewBox', `0 0 ${this.scale * graphBox.width} ${this.scale * graphBox.height}`)
+          svg.setAttribute('transform', `scale(${this.scale})`)
+          console.log('svg size', graphBox.width, graphBox.height, svg.getBoundingClientRect())
+          return graphBox // svg.getClientRects()[0] // getBoundingClientRect() // getClientRects()[0]
+        },
         hideDropdown () {
           console.log('hide')
           this.showExportSettings = false
+          if (document.querySelector('#exportSVG svg')) {
+            document.querySelector('#exportSVG svg').outerHTML = ''
+          }
         },
         displaySize () {
-          let svg = document.querySelector('svg') // .graph')
-          let size = svg.getClientRects()[0]
-          console.log('display size', size, this.scale, svg.getClientRects())
+          let size = this.createExportSvg()          //
+          // console.log(svg)
+          // var bbox = svg.getBBox()
+          // svg.setAttribute('width', bbox.x + bbox.width + 'px')
+          // svg.setAttribute('height', bbox.y + bbox.height + 'px')
+          // let size = svg.getBBox() // getClientRects()[0] // getBoundingClientRect() // getClientRects()[0]
+          // console.log('graph cloned', svg)
+          // console.log('display size', svg.transform, size, this.scale, svg.getClientRects())
           let width = this.scale * Math.trunc(size.width)
           let height = this.scale * Math.trunc(size.height)
           return `${width} x ${height} px`
@@ -90,44 +111,20 @@
             scale: this.scale
           })
         }, 400),
+        save (cb) {
+          this.createExportSvg() // creates export image
+          let svg = document.querySelector('#exportSVG svg')
+          cb(svg)
+          svg.outerHTML = ''
+        },
         savePNG () {
-          console.log(this.$store)
-          this.$store.dispatch('saveAsPng', this.scale)
-          // this.$store.commit('disableControls')
-          // this.$store.commit('resetZoom')
-          // // let graph = document.querySelector('.graph')
-          // // let svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
-          // // svg.appendChild(graph)
-          //
-          // let svg = document.querySelector('svg')
-          // let bBox = svg.getBBox()
-          // // let scale = this.scale
-          // let exportSvg = svg.cloneNode(true) // .cloneNode(true)
-          // // svg.setAttribute('transform', 'scale(3)')
-          // /*
-          // exportSvg.setAttribute('width', bBox.width * scale)
-          // exportSvg.setAttribute('height', bBox.height * scale)
-          // exportSvg.setAttribute('viewBox', `0 0 ${bBox.width * scale} ${bBox.height * scale}`)
-          // exportSvg.setAttribute('transform', `scale(${scale})`)
-          // */
-          // console.log('export svg', exportSvg, svg, bBox)
-          //
-          // // let exportTest = document.querySelector('#debug')
-          // // exportTest.appendChild(exportSvg)
-          // saveSvgAsPng(exportSvg, 'diagram.png')
-          // this.$store.commit('enableControls')
-          // this.saveCb = function () {
-          //   let svg = document.querySelector('svg')
-          //   let exportFrame = document.querySelector('exportFrame')
-          //
-          //   exportFrame.innerHTML = svg
-          //   //saveSvgAsPng(svg, 'diagram.png')
-          // }
-          // this.saveCb()
+          // console.log(this.name)
+          this.save((svg) =>
+            saveSvgAsPng(svg, this.name + '.png'))
         },
         saveSVG () {
-          // saveSvg(document.querySelector('svg'), 'diagram.svg')
-          this.$store.dispatch('saveAsSvg')
+          this.save((svg) =>
+            saveSvg(document.querySelector('svg'), this.name + '.svg'))
         }
       }
     }
@@ -141,18 +138,6 @@
       top: 500;
       left: 0;
       z-index: 1000;
-    }
-    .exportFrame {
-      position: fixed;
-      top: 0px;
-      left: 0px;
-      bottom: 0px;
-      right: 0px;
-      width: 100%;
-      height: 100%;
-      /*background-color: blue;*/
-      z-index: 998;
-      pointer-events: none;
     }
 
     .dropdown-menu {
@@ -174,6 +159,16 @@
         /*opacity: 0.8;*/
     }
 
+    #exportSVG {
+      /* hidden export area (used for size calculation & exporting)*/
+      // display: none;
+      position: absolute;
+      opacity: 0;
+      top: 0;
+      left: 0;
+      z-index: -1; /* behind render area */
+      /* svg background white / not transparent --> exort svg is invisble */
+    }
 /* Portrait and Landscape */
     // @media (screen)
     //   and (device-width: 320px)
