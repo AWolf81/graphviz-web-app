@@ -5,6 +5,7 @@ import App from './App'
 import router from './router'
 import VueLs from 'vue-ls'
 import store from './store'
+import './ie-fix.js'
 
 // load spinner css
 require('../node_modules/spinkit/css/spinners/8-circle.css')
