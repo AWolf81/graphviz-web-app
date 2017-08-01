@@ -24,13 +24,14 @@
                   <dropdown tag="button" trigger-tag="span" class="btn btn-small btn-default dropdown-toggle">
                     <span slot="trigger"
                     title="Save as"
-                    class="glyphicon glyphicon-floppy-disk"
-                    aria-hidden="true">...</span>
-                    <ul class="list-group dropdown-menu">
-                      <a href="#" class="list-group-item" @click="saveTxt">
-                        Download textfile
-                      </a>
-                    </ul>
+                    aria-hidden="true"><span class="glyphicon glyphicon-floppy-disk"></span>...</span>
+                    <div class="dropdown-menu">
+                      <div class="list-group">
+                        <a href="#" class="list-group-item" @click.prevent="saveTxt">
+                          Download textfile
+                        </a>
+                      </div>
+                    </div>
                   </dropdown>
                 </div>
               </div>
@@ -254,6 +255,7 @@ export default {
       return marker
     },
     saveTxt () {
+      console.log('save file...')
       this.setFilename()
       let element = document.createElement('a')
       element.setAttribute('href', 'data:text/plain;charset=utf-8,' +
@@ -420,6 +422,9 @@ this.loaded = true
   margin-bottom: 0;
 }
 
+.dropdown-menu > .list-group {
+  margin-bottom: 0px;
+}
 /*.dropdown-menu {
   overflow: hidden;
   height: 300px;
@@ -452,6 +457,10 @@ a.router-link-active, li.router-link-active a {
 .CodeMirror {
   border: 1px solid #eee;
   height: auto !important;
+}
+
+.CodeMirror pre {
+  z-index: auto;
 }
 
 .render-error {

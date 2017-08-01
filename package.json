@@ -9,7 +9,7 @@
     "start": "node build/dev-server.js",
     "build": "node build/build.js",
     "pre-deploy": "npm run build",
-    "deploy": "surge --domain drawviz.surge.sh",
+    "deploy": "surge --domain https://drawviz.surge.sh",
     "unit": "cross-env BABEL_ENV=test karma start test/unit/karma.conf.js --single-run",
     "e2e": "node test/e2e/runner.js",
     "test": "npm run unit && npm run e2e",
