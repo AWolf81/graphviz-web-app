@@ -156,7 +156,9 @@ export default {
       editorOption: {
         tabSize: 2,
         gutters: ['CodeMirror-linenumbers', 'markers'],
-        viewportMargin: Infinity
+        viewportMargin: Infinity,
+        lineWrapping: true,
+        scrollbarStyle: 'null'
       },
       isMaximizedRender: false
     }
@@ -304,6 +306,12 @@ export default {
             if (this.$route.params.slug) {
               let graph = this.storedGraphs
                 .filter((graph) => graph.slug === (this.$route.params.slug))[0]
+              if (!graph) {
+                this.errorMessage = "Couldn't load data. Please check your url."
+                this.showError = true
+                this.loaded = true
+                return
+              }
               this.localDotData = graph.data
               this.$store.commit('updateGraphData', graph)
               // console.log('loaded graph', graph)
@@ -313,8 +321,10 @@ export default {
             this.loaded = true
           } else {
             // show error
+            console.log('loaded')
             this.errorMessage = "Couldn't load data. Please check your url."
             this.showError = true
+            this.loaded = true
           }
         }
       }
@@ -433,11 +443,11 @@ a.router-link-active, li.router-link-active a {
   width: 10px;
 }
 
-/*.CodeMirror-scroll {
+.CodeMirror-scroll {
   height: auto;
   overflow-y: hidden;
   overflow-x: auto;
-}*/
+}
 
 .CodeMirror {
   border: 1px solid #eee;

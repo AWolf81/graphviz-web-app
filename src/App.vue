@@ -42,7 +42,7 @@ footer {
   padding-bottom: $spacing;
 }
 .col-md-8 {
-  padding-left: 0;
+  padding-left: $spacing;
   padding-right: $spacing;
 }
 
@@ -67,4 +67,10 @@ footer {
   color: #2c3e50;
   margin-top: 60px;
 }*/
+
+/* IE view-port fix */
+@-ms-viewport       { width: device-width; }
+@-o-viewport        { width: device-width; }
+@viewport           { width: device-width; }
+
 </style>
