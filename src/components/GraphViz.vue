@@ -451,7 +451,7 @@ a.router-link-active, li.router-link-active a {
 
 .CodeMirror {
   border: 1px solid #eee;
-  height: auto;
+  height: auto !important;
 }
 
 .render-error {
