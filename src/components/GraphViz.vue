@@ -158,8 +158,8 @@ export default {
         tabSize: 2,
         gutters: ['CodeMirror-linenumbers', 'markers'],
         viewportMargin: Infinity,
-        lineWrapping: true,
-        scrollbarStyle: 'null'
+        lineWrapping: false
+        // scrollbarStyle: 'null'
       },
       isMaximizedRender: false
     }
