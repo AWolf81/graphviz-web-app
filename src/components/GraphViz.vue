@@ -8,7 +8,7 @@
           <p><small>This app is using cookies for user traffic tracking. By closing this message you're accepting the usage. Don't like tracking - click <a href="javascript:gaDisableTracking()">here</a> to disable.</small></p>
       </alert>
       <div class="row" v-if="loaded">
-        <div class="col-md-4">
+        <div class="col-md-4" v-if="!isMaximizedRender">
           <nav class="navbar navbar-default">
               <div class="navbar-header pull-left">
                 <a class="navbar-brand">Definition</a>
@@ -25,7 +25,7 @@
                     <span slot="trigger"
                     title="Save as"
                     aria-hidden="true"><span class="glyphicon glyphicon-floppy-disk"></span>...</span>
-                    <div class="dropdown-menu">
+                    <div class="dropdown-menu pull-right">
                       <div class="list-group">
                         <a href="#" class="list-group-item" @click.prevent="saveTxt">
                           Download textfile
@@ -46,7 +46,7 @@
               </ul>
             </nav>
           </div>
-          <div class="col-md-8" :class="{maximize: isMaximizedRender}">
+          <div :class="{'col-md-12': isMaximizedRender, 'col-md-8': !isMaximizedRender}">
             <nav class="navbar navbar-default">
                 <div class="navbar-header pull-left">
                   <a class="navbar-brand">Render
@@ -465,7 +465,6 @@ a.router-link-active, li.router-link-active a {
 }
 
 .CodeMirror pre {
-  /* Todo fix z-index issue with dropdown-menu <<<<<<<<<<<<<<<<<<<<<<<<*/
   z-index: 0 !important;
 }
 
@@ -476,15 +475,4 @@ a.router-link-active, li.router-link-active a {
   margin-top: -20px;
 }
 
-.maximize {
-  position: absolute;
-  left: 0;
-  top: 65px;
-  bottom: 0;
-  width: 100%;
-  /*width: 100vw;
-  height: 100vh;*/
-  z-index: 100;
-  background-color: white;
-}
 </style>
