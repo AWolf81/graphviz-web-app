@@ -21,7 +21,7 @@
                   :title="!localDotData? 'Nothing to save!': 'Save your graph in browser'"
                   @click="openSave()" class="btn btn-small btn-default">
                   <span class="glyphicon glyphicon-floppy-disk" aria-hidden="true"></span></button>
-                  <dropdown tag="button" trigger-tag="span" class="btn btn-small btn-default dropdown-toggle">
+                  <dropdown trigger-tag="span" class="btn btn-small btn-default dropdown-toggle">
                     <span slot="trigger"
                     title="Save as"
                     aria-hidden="true"><span class="glyphicon glyphicon-floppy-disk"></span>...</span>
@@ -359,8 +359,13 @@ export default {
       this.errorMessage = ''
     },
     loadData (url) {
-      return axios.get(`https://crossorigin.me/${url}`)
+      return axios.get(`https://cors-anywhere.herokuapp.com/${url}`)
       .then((response) => response.data)
+      .catch((response) => {
+        console.log('response', response)
+        this.errorMessage = response.message + ' - Please try again later.'
+        this.showError = true
+      })
     },
     // loadStorage () {
     //   this.storedGraphs = this.$ls.get('storedGraphs') || []
@@ -451,7 +456,7 @@ a.router-link-active, li.router-link-active a {
 .CodeMirror-scroll {
   height: auto;
   overflow-y: hidden;
-  overflow-x: auto;
+  overflow-x: scroll;
 }
 
 .CodeMirror {
@@ -460,7 +465,8 @@ a.router-link-active, li.router-link-active a {
 }
 
 .CodeMirror pre {
-  z-index: auto;
+  /* Todo fix z-index issue with dropdown-menu <<<<<<<<<<<<<<<<<<<<<<<<*/
+  z-index: 0 !important;
 }
 
 .render-error {
