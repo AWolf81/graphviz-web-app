@@ -11,13 +11,31 @@ module.exports = function (config) {
     // 1. install corresponding karma launcher
     //    http://karma-runner.github.io/0.13/config/browsers.html
     // 2. add it to the `browsers` array below.
-    browsers: ['PhantomJS'],
+    // browsers: ['PhantomJS'],
+    browsers: ['Chrome'],
     frameworks: ['mocha', 'sinon-chai', 'phantomjs-shim'],
     reporters: ['spec', 'coverage'],
     files: ['./index.js'],
     preprocessors: {
       './index.js': ['webpack', 'sourcemap']
     },
+    // ** ADD THIS IN ** (vue-cli's webpack template doesn't add it by default)
+    plugins: [
+      // Launchers
+      'karma-chrome-launcher',
+
+      // Test Libraries
+      'karma-mocha',
+      'karma-sinon-chai',
+
+      // Preprocessors
+      'karma-webpack',
+      'karma-sourcemap-loader',
+
+      // Reporters
+      'karma-spec-reporter',
+      'karma-coverage'
+    ],
     webpack: webpackConfig,
     webpackMiddleware: {
       noInfo: true
@@ -28,6 +46,14 @@ module.exports = function (config) {
         { type: 'lcov', subdir: '.' },
         { type: 'text-summary' }
       ]
-    }
+    },
+    // logLevel: 'debug',
+    // Concurrency level
+    // how many browser should be started simultaneous
+    // concurrency: 1,
+    //
+    // browserNoActivityTimeout: 60000,
+    // browserDisconnectTimeout: 30000,
+    // captureTimeout: 60000,
   })
 }

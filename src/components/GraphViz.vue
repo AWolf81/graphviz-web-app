@@ -318,7 +318,15 @@ export default {
               this.$store.commit('updateGraphData', graph)
               // console.log('loaded graph', graph)
             } else {
-              this.localDotData = this.$store.state.dotData // initial load data
+              // console.log('graph query?', this.$route)
+              // if (this.$route.query.graph) { //<<<<<<< too complicated to pass --> better do saving server side like at jsfiddle
+              //   // this.localDotData = this.$route.query.graph // data passed in url with ?graph= query
+              //   this.$store.commit('updateGraphData', {
+              //     data: this.$route.query.graph
+              //   })
+              // } else {
+              this.localDotData = this.$store.state.dotData // initial load data // <<<<<<<< is this really needed??
+              // }
             }
             this.loaded = true
           } else {

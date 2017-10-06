@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 // import Hello from '@/components/Hello'
-import Graphviz from '@/components/Graphviz'
+import Graphviz from '@/components/GraphViz'
 import AppLayout from '@/components/layout/AppLayout'
 import About from '@/pages/About'
 
