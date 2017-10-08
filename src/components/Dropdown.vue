@@ -1,6 +1,6 @@
 <template lang="html">
   <component :is="tag" @click.prevent="toggle"
-    class="dropdown" :class="{open: visible}" v-on-clickaway="hideDropdown">
+    :class="{dropdown: dir == 'down', dropup: dir === 'up', open: visible}" v-on-clickaway="hideDropdown">
       <component
         :is="triggerTag"
         href="#"
@@ -29,6 +29,10 @@ export default {
   },
   mixins: [clickaway],
   props: {
+    dir: {
+      type: String,
+      default: 'down'
+    },
     animationClass: {
       type: String,
       default: 'animated'

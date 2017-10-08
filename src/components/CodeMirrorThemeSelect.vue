@@ -1,19 +1,19 @@
 <template lang="html">
-  <dropdown @show="triggerNanoscroller">
+  <dropdown @show="triggerNanoscroller" dir="down" tag="div">
     <span slot="trigger">Select theme ({{editorTheme}})
       <span class="caret"></span>
     </span>
     <div class="dropdown-menu">
       <div class="nano">
         <div class="nano-content">
-          <div class="list-group">
-            <a href="#"
-              class="list-group-item" :class="{active: theme === editorTheme}"
-              v-for="theme in themes"
-              @click="applyTheme(theme)">
-                {{theme}}
-            </a>
-          </div>
+            <div class="list-group">
+              <a href="#"
+                class="list-group-item" :class="{active: theme === editorTheme}"
+                v-for="theme in themes"
+                @click="applyTheme(theme)">
+                  {{theme}}
+              </a>
+            </div>
         </div>
       </div>
     </div>
