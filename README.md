@@ -2,7 +2,7 @@
 
 > Graphviz editor & rendering app with live updating.
 
-Live demo is online here https://drawviz.surge.sh
+Live demo is online here http://drawviz.com
 
 To learn more about graphviz please have a look at http://www.graphviz.org/.
 
