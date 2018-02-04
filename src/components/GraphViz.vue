@@ -4,7 +4,7 @@
       <alert v-if="loaded" id="appInfo" alert-type="cookie-info-alert">
         <strong>DrawViz</strong> is using Graphviz to create a graph from a specification written as text. <br/>
             It's like markdown but for creating graphs.
-            Check-out the links <router-link to="/about">here</router-link> or the examples to learn more about it.
+            Check-out the links <router-link to="/i/about">here</router-link> or the examples to learn more about it.
           <p><small>This app is using cookies for user traffic tracking. By closing this message you're accepting the usage. Don't like tracking - click <a href="javascript:gaDisableTracking()">here</a> to disable.</small></p>
       </alert>
       <div class="row" v-if="loaded">

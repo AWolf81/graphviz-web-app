@@ -39,12 +39,12 @@ export default {
           description: 'Github source of this app'
         },
         {
-          url: 'http://www.graphviz.org/Gallery.php',
+          url: 'http://www.graphviz.org/gallery/',
           caption: 'Graphviz gallery',
           description: 'Some of the examples graphs are from this gallery'
         },
         {
-          url: 'http://www.graphviz.org/content/dot-language',
+          url: 'https://graphviz.gitlab.io/_pages/doc/info/lang.html',
           caption: 'DOT language',
           description: 'Documentation of DOT language'
         },

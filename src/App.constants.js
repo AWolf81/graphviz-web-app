@@ -38,16 +38,16 @@ export const examples = [
   {
     id: 2,
     caption: 'Crazy',
-    url: 'http://www.graphviz.org/Gallery/directed/crazy.gv.txt'
+    url: 'https://graphviz.gitlab.io/_pages/Gallery/directed/crazy.gv.txt'
   }, {
     id: 3,
     caption: 'PSG',
-    url: 'http://www.graphviz.org/Gallery/directed/psg.gv.txt'
+    url: 'https://graphviz.gitlab.io/_pages/Gallery/directed/psg.gv.txt'
   },
   {
     id: 4,
     caption: 'Traffic lights', // loaded via ajax --> huge definition
-    url: 'http://www.graphviz.org/Gallery/directed/traffic_lights.gv.txt'
+    url: 'https://graphviz.gitlab.io/_pages/Gallery/directed/traffic_lights.gv.txt'
   },
   {
     id: 5,
