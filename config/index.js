@@ -8,10 +8,10 @@ const versionStringFull = childProcess.execSync('git for-each-ref refs/tags --so
 const version = (versionStringFull.split('/') || ['0.0.0']).pop()
   .replace(/'\s+/, '')
 
-console.log(versionStringFull, version)
+console.log(versionStringFull, version, version.length)
 
 var baseEnv = {
-  version: '"' + version + '"'
+  version: JSON.stringify(version)
 }
 
 module.exports = {
