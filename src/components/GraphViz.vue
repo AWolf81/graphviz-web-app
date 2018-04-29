@@ -10,7 +10,7 @@
       <div class="row" v-if="loaded">
 
         <multipane class="custom-resizer" layout="vertical" v-on:paneResize="resizeRender">
-          <div class="pane left-pane" :class="{full_width: !largeScreen}">
+          <div class="pane left-pane" :style="{minWidth: '25%'}" :class="{full_width: !largeScreen}">
             <!-- todo add initial width & save width in localstorage -->
             <!-- <div class="col-md-4" v-if="!isMaximizedRender" :style="{width: editorWidth}"> -->
             <!-- <div class="col-md-4" v-if="!isMaximizedRender" :style="{width: editorWidth}"> -->

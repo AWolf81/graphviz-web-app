@@ -4,6 +4,8 @@ import Vue from 'vue'
 import App from './App'
 import router from './router'
 import VueLs from 'vue-ls'
+import SocialSharing from 'vue-social-sharing'
+
 import store from './store'
 import './ie-fix.js'
 
@@ -14,6 +16,7 @@ require('./assets/main.css') // load styling before Vue bootstrapped
 Vue.config.productionTip = false
 
 Vue.use(VueLs)
+Vue.use(SocialSharing)
 
 /* eslint-disable no-new */
 new Vue({

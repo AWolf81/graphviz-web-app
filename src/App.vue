@@ -15,6 +15,8 @@ export default {
 $icon-font-path: '~bootstrap-sass/assets/fonts/bootstrap/';
 @import '~bootstrap-sass/assets/stylesheets/_bootstrap.scss';
 @import "~nanoscroller/bin/css/nanoscroller.css";
+$fa-font-path: '~font-awesome/fonts';
+@import '~font-awesome/scss/font-awesome.scss';
 
 $spacing: 8px; // spacing between render and definition
 

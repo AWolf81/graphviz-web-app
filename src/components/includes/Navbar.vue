@@ -39,7 +39,32 @@
           </dropdown>
       </ul>
       <ul class="nav navbar-nav navbar-right">
-        <!-- <li><a href="#">Link</a></li> -->
+        <dropdown>
+          <span slot="trigger">Share</span>
+          <social-sharing 
+            :url="currentPage()" 
+            inline-template 
+            hashtags="GraphvizWebApp,javascript"
+            network-tag="a">
+            <ul class="dropdown-menu">
+                <!-- <li>
+                  <network network="facebook">
+                    <i class="fa fa-fw fa-facebook"></i> Facebook
+                  </network>
+                </li> -->
+                <li>
+                  <network network="linkedin">
+                    <i class="fa fa-fw fa-linkedin"></i> LinkedIn
+                  </network>
+                </li>
+                <li>
+                  <network network="twitter">
+                    <i class="fa fa-fw fa-twitter"></i> Twitter
+                  </network>
+                </li>
+              </ul>
+            </social-sharing>
+        </dropdown>
         <dropdown>
           <span slot="trigger">?</span>
           <ul class="dropdown-menu">
@@ -86,6 +111,9 @@ export default {
   },
   methods: {
     ...mapMutations(['updateGraphData']),
+    currentPage () {
+      return window.location.href
+    },
     hideDropdown () {
       this.showExampleDropdown = false
     }
