@@ -10,7 +10,7 @@
       <div class="row" v-if="loaded">
 
         <multipane class="custom-resizer" layout="vertical" v-on:paneResize="resizeRender">
-          <div class="pane left-pane" :style="{minWidth: '25%'}" :class="{full_width: !largeScreen}">
+          <div class="pane left-pane" :class="{full_width: !largeScreen}">
             <!-- todo add initial width & save width in localstorage -->
             <!-- <div class="col-md-4" v-if="!isMaximizedRender" :style="{width: editorWidth}"> -->
             <!-- <div class="col-md-4" v-if="!isMaximizedRender" :style="{width: editorWidth}"> -->
@@ -22,10 +22,18 @@
                   <div class="btn-group navbar-btn" role="group" aria-label="toolbar">
                     <button type="button" @click="clear()" title="Clear graph data input" class="btn btn-small btn-default">
                       <span class="glyphicon glyphicon-trash"></span></button>
-                      <button type="button" :disabled="!localDotData"
+
+                      <!-- Save button localStorage if not loggedIn else cloud -->
+                      <button type="button" :disabled="!localDotData" v-if="!isAuthenticated"
                       :title="!localDotData? 'Nothing to save!': 'Save your graph in browser'"
                       @click="openSave()" class="btn btn-small btn-default">
                       <span class="glyphicon glyphicon-floppy-disk" aria-hidden="true"></span></button>
+                      
+                      <button :disabled="!localDotData" v-else 
+                        :title="!localDotData? 'Nothing to save!': 'Save your graph in cloud'"
+                        @click="openSave(true)" class="btn btn-small btn-default">
+                        <span class="glyphicon glyphicon-floppy-disk" aria-hidden="true"></span></button>
+
                       <dropdown trigger-tag="span" class="btn btn-small btn-default dropdown-toggle">
                         <span slot="trigger"
                         title="Save as"
@@ -35,6 +43,7 @@
                             <a href="#" class="list-group-item" @click.prevent="saveTxt">
                               Download textfile
                             </a>
+                            <a href="#" class="list-group-item" v-if="isAuthenticated" @click.prevent="openSave()">Save locally</a>
                           </div>
                         </div>
                       </dropdown>
@@ -48,7 +57,7 @@
               <!-- </div> -->
           </div>
           <multipane-resizer v-if="largeScreen"></multipane-resizer>
-          <div class="pane" :style="{ flexGrow: 1 }">
+          <div class="pane right-pane" :style="{ flexGrow: 1 }">
             <!-- <div class="render-panel" :class="{'col-md-12': isMaximizedRender, 'col-md-8': !isMaximizedRender}"> -->
               <nav class="navbar navbar-default">
                   <div class="navbar-header pull-left">
@@ -93,7 +102,7 @@
 </modal>
 
 <modal :show="showSave" @cancel="cancelSave" @ok="performSave(saveName)">
-  <h4 slot="header">Save graph in browser</h4>
+  <h4 slot="header">Save graph in {{saveToCloud ? 'cloud' : 'browser'}}</h4>
   <form slot="body" @submit.prevent="performSave(saveName)">
     <div class="form-group">
       <label>Please enter a name for your graph</label>
@@ -121,7 +130,7 @@ Are you sure to clear the editor? (no undo)
 <script>
 import Vue from 'vue'
 import axios from 'axios'
-import {mapState, mapMutations} from 'vuex'
+import { mapState, mapMutations, mapGetters } from 'vuex'
 import _ from 'lodash'
 import { codemirror } from 'vue-codemirror'
 import themeSelect from './CodeMirrorThemeSelect.vue'
@@ -152,7 +161,7 @@ Vue.directive('focus', {
 })
 
 export default {
-  mixins: [ pageBreakMixin ],
+  mixins: [pageBreakMixin],
   data () {
     return {
       $editor: undefined,
@@ -163,6 +172,7 @@ export default {
       errorMessage: '', // app errors
       renderErrorMessage: '', // e.g. syntax error for dot
       saveName: undefined,
+      saveToCloud: undefined, // if true --> save to cloud
       saveReady: false,
       controlIconsEnabled: true,
       currentTheme: '',
@@ -193,9 +203,16 @@ export default {
   },
   computed: {
     ...mapState({
-      localDotData: (state) => state.dotData
+      localDotData: state => state.dotData
     }),
-    ...mapState(['editorTheme', 'filename', 'graphToDelete', 'storedGraphs', 'showDelete'])
+    ...mapState([
+      'editorTheme',
+      'filename',
+      'graphToDelete',
+      'storedGraphs',
+      'showDelete'
+    ]),
+    ...mapGetters(['isAuthenticated'])
   },
   watch: {
     // localDotData: _.debounce(() => {
@@ -231,9 +248,7 @@ export default {
     // }, 100)
   },
   methods: {
-    ...mapMutations([
-      'updateGraphData'
-    ]),
+    ...mapMutations(['updateGraphData']),
     cancelDelete () {
       this.$store.commit('hideDeleteConfirm')
     },
@@ -246,7 +261,9 @@ export default {
     deleteGraph () {
       this.$store.dispatch('triggerRemoveGraph')
     },
-    updateDot: _.debounce(function (data) { this.updateGraphData({data: data}) }, 500),
+    updateDot: _.debounce(function (data) {
+      this.updateGraphData({ data: data })
+    }, 500),
     onEditorReady () {
       this.$editor = document.querySelector('.CodeMirror').CodeMirror
 
@@ -270,12 +287,16 @@ export default {
 
       // Set line CSS class to the line number & affecting the background of the line with the css class of line-error
       // codeMirrorEditor.setLineClass(actualLineNumber, 'background', 'line-error')
-      codeMirrorEditor.setGutterMarker(actualLineNumber, 'markers', this.makeMarker())
+      codeMirrorEditor.setGutterMarker(
+        actualLineNumber,
+        'markers',
+        this.makeMarker()
+      )
     },
     makeMarker () {
       var marker = document.createElement('div')
       marker.style.color = '#822'
-      marker.innerHTML = `<span title="${this.renderErrorMessage}">●</span>`
+      marker.innerHTML = `<span title='${this.renderErrorMessage}'>●</span>`
       return marker
     },
     resizeRender (e) {
@@ -287,8 +308,11 @@ export default {
       console.log('save file...')
       this.setFilename()
       let element = document.createElement('a')
-      element.setAttribute('href', 'data:text/plain;charset=utf-8,' +
-        encodeURIComponent(this.localDotData.replace(/([^\r])\n/g, '$1\r\n')))
+      element.setAttribute(
+        'href',
+        'data:text/plain;charset=utf-8,' +
+          encodeURIComponent(this.localDotData.replace(/([^\r])\n/g, '$1\r\n'))
+      )
       element.setAttribute('download', (this.saveName || 'dotdata') + '.txt')
 
       element.style.display = 'none'
@@ -302,50 +326,66 @@ export default {
       // if (this.$route.name !== 'Home') {
       // not home --> check if index exists and render
       let index = this.$route.params.index
+      let user = this.$route.params.user
+      let slug = this.$route.params.slug
       let example = examples[index]
 
       if (!isNaN(index)) {
         // numeric value --> example from index
         if (example.data) {
           // this.localDotData = example.data
-          this.updateGraphData({data: example.data})
+          this.updateGraphData({ data: example.data })
           this.loaded = true
         } else {
           this.loadData(example.url).then(data => {
             // this.localDotData = data
-            this.updateGraphData({data})
+            this.updateGraphData({ data })
             this.loaded = true
           })
         }
+      } else if (user && slug) {
+        this.fetchDbData(user, slug).then(({dotfiles}) => {
+          // const fetchedData = Object.assign({}, data.dotfiles[0])
+          console.log('fetched', dotfiles)
+          this.updateGraphData({
+            data: dotfiles.metadata.body,
+            name: dotfiles.title
+          })
+          this.loaded = true
+        })
       } else {
-        // not a name
+        // not a name --> check if query contains dot
         let url = this.$route.query.url
         // console.log('load from url', url)
         if (url) {
           // defined but a string --> use url params to load data
           console.log(this.$route)
-          this.loadData(url).then(data => {
-            // this.localDotData = data
-            this.updateGraphData({data})
-            this.loaded = true
-          }).catch((err) => {
-            this.errorMessage = err.message
-            this.showError = true
-          })
+          this.loadData(url)
+            .then(data => {
+              // this.localDotData = data
+              this.updateGraphData({ data })
+              this.loaded = true
+            })
+            .catch(err => {
+              this.errorMessage = err.message
+              this.showError = true
+            })
         } else {
           if (this.$route.name === 'Home') {
             // console.log('home route', this.$route)
             if (this.$route.params.slug) {
-              let graph = this.storedGraphs
-                .filter((graph) => graph.slug === (this.$route.params.slug))[0]
+              let graph = this.storedGraphs.filter(
+                graph => graph.slug === this.$route.params.slug
+              )[0]
               if (!graph) {
-                this.errorMessage = "Couldn't load data. Please check your url."
+                this.errorMessage =
+                  'Couldn\'t load data. Please check your url.'
                 this.showError = true
                 this.loaded = true
                 return
               }
               // this.localDotData = graph.data
-              this.updateGraphData({data: graph.data})
+              this.updateGraphData({ data: graph.data })
               this.$store.commit('updateGraphData', graph)
               // console.log('loaded graph', graph)
             } else {
@@ -363,7 +403,7 @@ export default {
           } else {
             // show error
             console.log('loaded')
-            this.errorMessage = "Couldn't load data. Please check your url."
+            this.errorMessage = 'Couldn\'t load data. Please check your url.'
             this.showError = true
             this.loaded = true
           }
@@ -374,9 +414,10 @@ export default {
       //   this.loaded = true
       // }
     },
-    openSave () {
+    openSave (saveToCloud) {
       this.setFilename()
       this.showSave = true
+      this.saveToCloud = saveToCloud
     },
     setFilename () {
       this.saveName = this.filename
@@ -384,9 +425,14 @@ export default {
     },
     toggleSize () {
       this.isMaximizedRender = !this.isMaximizedRender
-      setTimeout(() =>
-        this.$store.commit('updateSVGSize', document.querySelector('svg').getBBox())
-      , 0)
+      setTimeout(
+        () =>
+          this.$store.commit(
+            'updateSVGSize',
+            document.querySelector('svg').getBBox()
+          ),
+        0
+      )
     },
     // render error updating
     updateError (error) {
@@ -398,13 +444,24 @@ export default {
       this.errorMessage = ''
     },
     loadData (url) {
-      return axios.get(`https://cors-anywhere.herokuapp.com/${url}`)
-      .then((response) => response.data)
-      .catch((response) => {
-        console.log('response', response)
-        this.errorMessage = response.message + ' - Please try again later.'
-        this.showError = true
-      })
+      return axios
+        .get(`https://cors-anywhere.herokuapp.com/${url}`)
+        .then(response => response.data)
+        .catch(response => {
+          console.log('response', response)
+          this.errorMessage = response.message + ' - Please try again later.'
+          this.showError = true
+        })
+    },
+    fetchDbData (user, slug) {
+      return axios
+        .get(`/.netlify/functions/data/${user}/${slug}`)
+        .then(response => response.data)
+        .catch(response => {
+          console.log('response', response)
+          this.errorMessage = response.message + ' - Please try again later.'
+          this.showError = true
+        })
     },
     // loadStorage () {
     //   this.storedGraphs = this.$ls.get('storedGraphs') || []
@@ -417,7 +474,7 @@ export default {
     },
     ok () {
       // this.localDotData = ''
-      this.updateGraphData({data: '', name: ''})
+      this.updateGraphData({ data: '', name: '' })
       this.showClear = false
       this.$router.push('/')
     },
@@ -434,11 +491,38 @@ export default {
         return
       }
 
-      this.save(name)
+      if (this.saveToCloud) {
+        console.log('TODO: save to cosmic.js')
+        // call aws --> aws checks if name is already saved & updates data (revisions handled by cosmic)
+        axios
+          .post('/.netlify/functions/data/', {
+            params: this.$route.params,
+            title: name,
+            body: this.localDotData
+          })
+          .then(result => {
+            // console.log('result', result)
+            const { redirect } = result.data
+            if (redirect) {
+              console.log('redirect', redirect)
+              this.$router.push(redirect)
+            }
+          })
+          .catch(err => {
+            console.log('err', err)
+            this.errorMessage = err.message
+            this.showError = true
+          })
+      } else {
+        this.save(name)
+      }
+
       this.showSave = false
+      this.saveToCloud = false
     },
     cancelSave () {
       this.showSave = false
+      this.saveToCloud = false
     },
     save (name) {
       this.$store.commit('saveGraph', name)
@@ -453,10 +537,10 @@ export default {
 /*@media (min-width: 768px) {*/
 @media (min-width: 992px) {
   .render-panel {
-    position:fixed;
-    right:0;
+    position: fixed;
+    right: 0;
 
-    border-color: #F9F9F9;
+    border-color: #f9f9f9;
     border-left-style: solid;
     border-width: 5px;
     /*min-height: 200px;*/
@@ -480,14 +564,15 @@ export default {
 .navbar .btn-group {
   padding-right: 0.5em;
 }
-a.router-link-active, li.router-link-active a {
+a.router-link-active,
+li.router-link-active a {
   color: #fff;
   background-color: #337ab7;
 }
 
 /* CodeMirror styles */
 .line-error {
-  background: #FBC2C4 !important;
+  background: #fbc2c4 !important;
   color: #8a1f11 !important;
 }
 
@@ -533,7 +618,7 @@ a.router-link-active, li.router-link-active a {
 }
 
 .multipane > div {
-    z-index: auto;
+  z-index: auto;
 }
 
 .custom-resizer > .pane {
@@ -548,13 +633,14 @@ a.router-link-active, li.router-link-active a {
 .custom-resizer > .pane ~ .pane {
 }
 .custom-resizer > .multipane-resizer {
-  margin: 0; left: 0;
+  margin: 0;
+  left: 0;
   position: relative;
   background: #f9f9f9;
   border-radius: 4px;
   &:before {
     display: block;
-    content: "";
+    content: '';
     width: 5px;
     height: 40px;
     position: absolute;
@@ -568,16 +654,15 @@ a.router-link-active, li.router-link-active a {
     background-color: #d1d1d1;
   }
   &:after {
-      width: 5px;
-      display: block;
-      content: "";
-      height: 45px;
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      margin-top: -20px;
-      margin-left: -1.5px;
-
+    width: 5px;
+    display: block;
+    content: '';
+    height: 45px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-top: -20px;
+    margin-left: -1.5px;
   }
   &:hover {
     &:before {
@@ -588,18 +673,25 @@ a.router-link-active, li.router-link-active a {
 
 .left-pane {
   width: 50%;
-  min-width: 15%;
+  min-width: 25%;
 }
 
+.right-pane {
+  width: 50%;
+  max-width: 75%;
+}
 .full_width {
   width: 100% !important;
 }
 
-@media(max-width: 768px) {
+@media (max-width: 768px) {
   /* stack panes if smaller than 768px*/
   .multipane.layout-v {
     display: block;
   }
+  .right-pane {
+    width: 100%;
+    max-width: 100%;
+  }
 }
-
 </style>

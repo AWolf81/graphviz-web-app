@@ -10,7 +10,7 @@
                 <h4 class="media-heading">{{graph.name}}</h4>
                 <button class="btn btn-xs" @click="show(graph)">show</button>
                 <button class="btn btn-xs btn-danger" @click="showDeleteConfirm(graph)">delete</button>
-                <div class="media-footer">created at {{formatData(graph.createdAt)}}</div>
+                <div class="media-footer">created at {{formatDate(graph.createdAt)}}</div>
               </div>
             </div>
           <!-- </div> -->
@@ -21,7 +21,7 @@
 </template>
 
 <script>
-import moment from 'moment'
+import {formatDate} from '../helpers/date'
 import {mixin as clickaway} from 'vue-clickaway'
 import dropdown from '@/components/Dropdown.vue'
 import modal from '@/components/Modal.vue'
@@ -40,9 +40,7 @@ export default {
   },
   props: ['graphs'],
   methods: {
-    formatData (date) {
-      return moment(date).format('YYYY-MM-DD HH:m:s')
-    },
+    formatDate,
     show (graph) {
       console.log('show graph', graph.name)
       if (graph.slug) {

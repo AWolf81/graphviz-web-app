@@ -2,6 +2,7 @@ import Vue from 'vue'
 import VueLs from 'vue-ls'
 import Vuex from 'vuex'
 import panZoom from './modules/panzoom'
+import auth from './modules/auth'
 import slugify from '@/helpers/slugify'
 import router from '@/router'
 import {DEFAULT_CODEMIRROR_THEME} from '@/App.constants'
@@ -11,7 +12,8 @@ Vue.use(VueLs)
 
 export default new Vuex.Store({
   modules: {
-    panZoom
+    panZoom,
+    auth
   },
   state: {
     dotData: Vue.ls.get('draftDot') || `digraph {

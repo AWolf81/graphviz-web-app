@@ -76,6 +76,19 @@
             <li><a href="#">Separated link</a></li> -->
           </ul>
         </dropdown>
+        <dropdown v-if="isAuthenticated">
+            <span slot="trigger">
+              <img :src="user.avatar" :title="user.username"/>
+            </span>
+            <ul class="dropdown-menu">
+              <li class="dropdown-header">Welcome {{user.username}}</li>
+              <li><router-link :to="{name: 'Dashboard'}">Dashboard</router-link></li>
+              <li class="divider"></li>
+              <li><a href="#" @click="logout">Logout</a></li>
+            </ul>
+        </dropdown>
+        <li v-else><a href="#" @click="login">Login</a></li>
+        <li><a href="#" @click="helloLambda">Test lambda</a></li>
       </ul>
     </div><!-- /.navbar-collapse -->
   <!-- </transition> -->
@@ -85,11 +98,13 @@
 
 <script>
 import {mixin as clickaway} from 'vue-clickaway'
-import {mapState, mapMutations} from 'vuex'
+import {mapState, mapMutations, mapGetters} from 'vuex'
 import { examples } from '../../App.constants'
 import localGraphStorage from '@/components/LocalGraphStorage.vue'
 import dropdown from '@/components/Dropdown.vue'
 import Headroom from 'headroom.js'
+import Netlify from 'netlify-auth-providers'
+import axios from 'axios'
 
 export default {
   mixins: [
@@ -100,7 +115,11 @@ export default {
     dropdown
   },
   computed: {
-    ...mapState(['storedGraphs', 'dotData'])
+    ...mapState(['storedGraphs', 'dotData']),
+    ...mapState({
+      user: state => state.auth.user
+    }),
+    ...mapGetters(['isAuthenticated'])
   },
   data () {
     return {
@@ -116,6 +135,29 @@ export default {
     },
     hideDropdown () {
       this.showExampleDropdown = false
+    },
+    login () {
+      // console.log(process.env) // ['site_id'])
+      const authenticator = new Netlify(process.env.NETLIFY_SITE_ID ? {'site_id': process.env.NETLIFY_SITE_ID} : {})
+      authenticator.authenticate({provider: 'github', scope: 'user'}, (err, data) => {
+        if (err) {
+          console.log(err)
+          // return $("#output").text("Error Authenticating with GitHub: " + err);
+        }
+        console.log('Authenticated with GitHub. Access Token: ' + data.token, data)
+        this.$store.dispatch('login', data.token)
+        // $("#output").text("Authenticated with GitHub. Access Token: " + data.token);
+      })
+    },
+    logout () {
+      this.$store.dispatch('logout')
+    },
+    async helloLambda () {
+      // fetch('/.netlify/functions/hello')
+      // .then(response => response.json())
+      // .then(json => console.log(json))
+      const {data} = await axios.get('/.netlify/functions/hello')
+      console.log('response', data.msg)
     }
     // removeGraph (graph) {
     //   this.$store.commit('removeGraph', graph)
@@ -132,7 +174,7 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
   /* navbar */
   .navbar-default {
     background-color: #f9f9f9;
@@ -157,6 +199,11 @@ export default {
 }
 .headroom--unpinned {
     transform: translateY(-100%);
+}
+
+img {
+  width: 30px;
+  height: 30px;
 }
 
 </style>

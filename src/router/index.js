@@ -2,6 +2,7 @@ import Vue from 'vue'
 import Router from 'vue-router'
 // import Hello from '@/components/Hello'
 import Graphviz from '@/components/GraphViz'
+import Dashboard from '@/components/Dashboard'
 import AppLayout from '@/components/layout/AppLayout'
 import About from '@/pages/About'
 
@@ -16,6 +17,20 @@ export default new Router({
       component: AppLayout,
       children: [
         {
+          path: '/dashboard',
+          name: 'Dashboard',
+          component: Dashboard
+        },
+        { // route for localStorage dots
+          path: ':user/:slug',
+          name: 'cloud',
+          component: Graphviz,
+          meta: { reuse: false }
+          // alias: '/example/:index'
+          // name: 'Hello',
+          //   component: Hello
+        },
+        { // route for localStorage dots or new dot
           path: '/:slug?',
           name: 'Home',
           component: Graphviz,

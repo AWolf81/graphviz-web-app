@@ -10,9 +10,11 @@ var chalk = require('chalk')
 var webpack = require('webpack')
 var config = require('../config')
 var webpackConfig = require('./webpack.prod.conf')
+var createLambda = require('./create-netlify-lambda')
 
 var spinner = ora('building for production...')
 spinner.start()
+
 
 rm(path.join(config.build.assetsRoot, config.build.assetsSubDirectory), err => {
   if (err) throw err
@@ -34,5 +36,6 @@ rm(path.join(config.build.assetsRoot, config.build.assetsSubDirectory), err => {
     ))
 
     //publish(); // publish to gh-pages
+    createLambda()
   })
 })

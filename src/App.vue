@@ -6,8 +6,19 @@
 </template>
 
 <script>
+import Vue from 'vue'
+
 export default {
-  name: 'app'
+  name: 'app',
+  created () {
+    // initial load user
+    const token = Vue.ls.get('token')
+    if (token) {
+      console.log('token available')
+      this.$store.dispatch('setHeaders')
+      this.$store.dispatch('fetchUserInfo')
+    }
+  }
 }
 </script>
 
