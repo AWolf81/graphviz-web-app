@@ -6,7 +6,9 @@ const env = require('dotenv').config()
 // console.log('env', env, prodEnv)
 
 let envParsed = {}
-Object.keys(env.parsed).forEach(key => envParsed[key] = `"${env.parsed[key]}"`)
+if (env.parsed) {
+    Object.keys(env.parsed).forEach(key => envParsed[key] = `"${env.parsed[key]}"`)
+}
 
 // console.log('merged', merge({}, envParsed, {NODE_ENV: '"development"'}))
 
