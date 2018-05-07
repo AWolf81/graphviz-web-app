@@ -3,7 +3,7 @@ import request from "request-promise-native";
 // import vandium from 'vandium'
 
 // const vandium = require( 'vandium' );
-const env = require("dotenv").config();
+// const env = require("dotenv").config(); // todo add webpack dotenv to load .env file
 
 function createMetaFieldsArray(user, body) {
   return [
@@ -61,8 +61,8 @@ export async function handler(event, context, callback) {
   if (event.httpMethod === "GET") {
     const api = Cosmic();
     const bucket = api.bucket({
-      slug: env.parsed.COSMIC_SLUG,
-      read_key: env.parsed.COSMIC_READ_KEY
+      slug: process.env.COSMIC_SLUG,
+      read_key: process.env.COSMIC_READ_KEY
     });
     // const data = await bucket.getObjectsByType({type_slug: 'dotfiles'})
     let urlParts = event.path.split('/');
@@ -101,9 +101,9 @@ export async function handler(event, context, callback) {
     console.log("post", event.body);
     const api = Cosmic();
     const bucket = api.bucket({
-      slug: env.parsed.COSMIC_SLUG,
-      read_key: env.parsed.COSMIC_READ_KEY,
-      write_key: env.parsed.COSMIC_WRITE_KEY
+      slug: process.env.COSMIC_SLUG,
+      read_key: process.env.COSMIC_READ_KEY,
+      write_key: process.env.COSMIC_WRITE_KEY
     });
     const eventBody = JSON.parse(event.body);
     const body = eventBody.body;
