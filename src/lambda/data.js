@@ -1,5 +1,6 @@
 import Cosmic from "cosmicjs";
 import request from "request-promise-native";
+import { url } from "inspector";
 // import vandium from 'vandium'
 
 // const vandium = require( 'vandium' );
@@ -66,8 +67,13 @@ export async function handler(event, context, callback) {
     });
     // const data = await bucket.getObjectsByType({type_slug: 'dotfiles'})
     let urlParts = event.path.split('/');
-    const slug = urlParts.pop();
-    const queryUser = urlParts.pop();
+    let slug, queryUser;
+    // console.log(urlParts, urlParts.length);
+    if (urlParts.length >= 4) {
+      // '', 'data', ':user', ':slug', ':revision?'
+      slug = urlParts.pop();
+      queryUser = urlParts.pop();
+    }
 
     console.log('get slug', event, slug);
     try {
