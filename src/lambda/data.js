@@ -3,7 +3,7 @@ import request from "request-promise-native";
 // import vandium from 'vandium'
 
 // const vandium = require( 'vandium' );
-// const env = require("dotenv").config(); // todo add webpack dotenv to load .env file
+require('dotenv').config()
 
 function createMetaFieldsArray(user, body) {
   return [

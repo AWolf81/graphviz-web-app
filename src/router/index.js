@@ -21,6 +21,18 @@ export default new Router({
           name: 'Dashboard',
           component: Dashboard
         },
+        {
+          path: '/i/about',
+          name: 'About',
+          component: About,
+          meta: { reuse: false }
+        },
+        {
+          path: '/example/:index?',
+          name: 'Example',
+          component: Graphviz,
+          meta: { reuse: false }
+        },
         { // route for localStorage dots
           path: ':user/:slug',
           name: 'cloud',
@@ -38,18 +50,6 @@ export default new Router({
           // alias: '/example/:index'
           // name: 'Hello',
           //   component: Hello
-        },
-        {
-          path: '/example/:index?',
-          name: 'Example',
-          component: Graphviz,
-          meta: { reuse: false }
-        },
-        {
-          path: '/i/about',
-          name: 'About',
-          component: About,
-          meta: { reuse: false }
         }
       ]
     }
