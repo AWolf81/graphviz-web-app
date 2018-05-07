@@ -5,7 +5,14 @@
 
 # The following redirect is intended for use with most SPA's that handles routing internally.
 [[redirects]]
+  from = "/static/*"
+  to = "/static/*"
+  status = 200
+  force = false
+
+[[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
   force = true # Ensure that we always redirect
+
