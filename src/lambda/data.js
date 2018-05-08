@@ -1,6 +1,7 @@
 import Cosmic from "cosmicjs";
 import request from "request-promise-native";
-import { url } from "inspector";
+import pathToRegex from 'path-to-regexp'; 
+
 // import vandium from 'vandium'
 
 // const vandium = require( 'vandium' );
@@ -77,16 +78,17 @@ export async function handler(event, context, callback) {
       read_key: process.env.COSMIC_READ_KEY
     });
     // const data = await bucket.getObjectsByType({type_slug: 'dotfiles'})
-    let urlParts = event.path.split('/');
-    let slug, queryUser;
-    // console.log(urlParts, urlParts.length);
-    if (urlParts.length >= 4) {
-      // '', 'data', ':user', ':slug', ':revision?'
-      slug = urlParts.pop();
-      queryUser = urlParts.pop();
+    let queryUser, slug;
+    const re = pathToRegex('/data/:user/:dot');
+    const tokens = re.exec(event.path);
+
+    if (tokens && tokens.length >= 3) {
+      // user & slug in url
+      queryUser = tokens[1];
+      slug = tokens[2];
     }
 
-    console.log('get slug', event, slug);
+    // console.log('path parts', event.path, tokens, queryUser, slug);
     try {
       const data = await bucket.searchObjectType({
         type_slug: "dotfiles",
@@ -98,9 +100,9 @@ export async function handler(event, context, callback) {
       // todo check map with-out query in path
       const foundObj = data.objects && data.objects.filter(object => object.slug === slug)[0];
       
-      console.log('metafield query', queryUser || user.login);
+      // console.log('metafield query', queryUser || user.login);
       // todo check if visibility is set to public --> restriction if not owner
-      console.log('data', data, foundObj, slug);
+      // console.log('data', data, foundObj, slug);
 
       callback(null, {
         headers: {
@@ -117,7 +119,7 @@ export async function handler(event, context, callback) {
   }
 
   if (event.httpMethod === "POST") {
-    console.log("post", event.body);
+    // console.log("post", event.body);
     const api = Cosmic();
     const bucket = api.bucket({
       slug: process.env.COSMIC_SLUG,
@@ -142,7 +144,7 @@ export async function handler(event, context, callback) {
         });
       }
 
-      console.log("edit", slug, body, event.body, data.objects.length);
+      // console.log("edit", slug, body, event.body, data.objects.length);
 
       if (data.objects.length === 0) {
         // add new graph
@@ -157,7 +159,7 @@ export async function handler(event, context, callback) {
         };
         const {object: newObject} = await bucket.addObject(params);
 
-        console.log('Added object', newObject, newObject.slug);
+        // console.log('Added object', newObject, newObject.slug);
         callback(null, {
           headers: {
             "content-type": "application/json"
@@ -177,7 +179,7 @@ export async function handler(event, context, callback) {
           metafields: createMetaFieldsArray(eventBody.params.user, body)
         });
 
-        console.log("updated", response);
+        // console.log("updated", response);
         callback(null, {
           headers: {
             "content-type": "application/json"

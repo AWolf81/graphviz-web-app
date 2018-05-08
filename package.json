@@ -43,6 +43,7 @@
     "nanoscroller": "^0.8.7",
     "netlify-auth-providers": "^1.0.0-alpha5",
     "node-sass": "^4.7.2",
+    "path-to-regexp": "^2.2.1",
     "request": "^2.85.0",
     "request-promise-native": "^1.0.5",
     "sass-loader": "^6.0.7",
