@@ -40,7 +40,7 @@ export default {
     async login ({ dispatch, state }, token) {
       dispatch('setToken', token)
       await dispatch('fetchUserInfo')
-      console.log('logged in', state.user)
+      // console.log('logged in', state.user)
     },
     logout ({dispatch, commit}) {
       commit('updateUser', undefined)
@@ -50,7 +50,7 @@ export default {
     },
     async fetchUserInfo ({ commit }) {
       const { data: user } = await axios.get(`${GITHUB_API_URL}/user`)
-      console.log('Fetch user', user)
+      // console.log('Fetch user', user)
       commit('updateUser', user)
     }
   }
