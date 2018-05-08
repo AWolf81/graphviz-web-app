@@ -25,6 +25,16 @@ function createMetaFieldsArray(user, body) {
   ];
 }
 
+function errorHandler(callback, error) {
+  callback(null, {
+    headers: {
+      "content-type": "application/json"
+    },
+    statusCode: 200,
+    body: JSON.stringify(error)
+  });
+}
+
 export async function handler(event, context, callback) {
   // console.log('event info', event, context)
   console.log('event src domain', event.referer)
@@ -56,13 +66,7 @@ export async function handler(event, context, callback) {
     // console.log('user response', response, event)
   } catch ({error}) {
     // console.log("error", error);
-    callback(null, {
-      headers: {
-        "content-type": "application/json"
-      },
-      statusCode: 200,
-      body: JSON.stringify(error)
-    });
+    errorHandler(callback, error);
     return;
   }
 
@@ -104,9 +108,10 @@ export async function handler(event, context, callback) {
         statusCode: 200,
         body: JSON.stringify({ dotfiles: foundObj || data.objects})
       });
-    } catch (err) {
-      console.log("error", err);
-      return err;
+    } catch ({error}) {
+      // console.log("error", error);
+      errorHandler(callback, error);
+      return;
     }
   }
 
@@ -182,8 +187,10 @@ export async function handler(event, context, callback) {
           })
         });
       }
-    } catch (err) {
-      return err;
+    } catch ({error}) {
+      // console.log("error", error);
+      errorHandler(callback, error);
+      return;
     }
   }
 }
