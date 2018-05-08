@@ -99,7 +99,7 @@ export async function handler(event, context, callback) {
       const foundObj = data.objects && data.objects.filter(object => object.slug === slug)[0];
       
       // todo check if visibility is set to public --> restriction if not owner
-      // console.log('data', data, user);
+      console.log('data', data, foundObj, slug);
 
       callback(null, {
         headers: {
