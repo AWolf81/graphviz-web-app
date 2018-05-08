@@ -54,9 +54,16 @@ export async function handler(event, context, callback) {
     }); // get auth user,
 
     // console.log('user response', response, event)
-  } catch (err) {
-    console.log("error", err);
-    return err;
+  } catch ({error}) {
+    // console.log("error", error);
+    callback(null, {
+      headers: {
+        "content-type": "application/json"
+      },
+      statusCode: 200,
+      body: JSON.stringify(error)
+    });
+    return;
   }
 
   if (event.httpMethod === "GET") {
