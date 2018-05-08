@@ -98,6 +98,7 @@ export async function handler(event, context, callback) {
       // todo check map with-out query in path
       const foundObj = data.objects && data.objects.filter(object => object.slug === slug)[0];
       
+      console.log('metafield query', queryUser || user.login);
       // todo check if visibility is set to public --> restriction if not owner
       console.log('data', data, foundObj, slug);
 
