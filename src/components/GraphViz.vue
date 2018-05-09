@@ -457,10 +457,11 @@ export default {
       return axios
         .get(`/.netlify/functions/data/${user}/${slug}`)
         .then(response => response.data)
-        .catch(response => {
-          console.log('response', response)
-          this.errorMessage = response.message + ' - Please try again later.'
+        .catch(({response}) => {
+          // console.log('response', response)
+          this.errorMessage = response.data.error.message
           this.showError = true
+          this.loaded = true
         })
     },
     // loadStorage () {
@@ -498,7 +499,8 @@ export default {
           .post('/.netlify/functions/data/', {
             params: this.$route.params,
             title: name,
-            body: this.localDotData
+            body: this.localDotData.toString(),
+            visibility: 'private'
           })
           .then(result => {
             // console.log('result', result)

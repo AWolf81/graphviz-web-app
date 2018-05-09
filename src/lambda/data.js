@@ -7,7 +7,7 @@ import pathToRegex from 'path-to-regexp';
 // const vandium = require( 'vandium' );
 require('dotenv').config()
 
-function createMetaFieldsArray(user, body) {
+function createMetaFieldsArray(user, body, visibility) {
   return [
     {
       title: "Github user",
@@ -22,16 +22,23 @@ function createMetaFieldsArray(user, body) {
       value: body,
       type: "textarea",
       required: true
-    }
+    },
+    {
+      title: "Visibility",
+      key: "visibility",
+      value: visibility,
+      type: "text",
+      required: true
+    },
   ];
 }
 
-function errorHandler(callback, error) {
+function errorHandler(callback, error, statusCode = 200) {
   callback(null, {
     headers: {
       "content-type": "application/json"
     },
-    statusCode: 200,
+    statusCode,
     body: JSON.stringify(error)
   });
 }
@@ -98,8 +105,19 @@ export async function handler(event, context, callback) {
       });
 
       // todo check map with-out query in path
-      const foundObj = slug ? data.objects && data.objects.filter(object => object.slug === slug)[0] : data.objects;
+      let foundObj = slug ? data.objects && data.objects.filter(object => object.slug === slug)[0] : data.objects;
       
+      if (queryUser && queryUser !== user.login) {
+        // query for not owned dotfile:
+        // visibility = [username]  // future feature
+        // or visibility = public
+        console.log('queryUser != login', queryUser, user.login, foundObj.metadata.visibility );
+        if (foundObj.metadata.visibility && foundObj.metadata.visibility === 'private') { 
+          // console.log('error!', new Error('Access denied!'));
+          errorHandler(callback, {error: { message: 'Access denied!'}}, 401); // new Error('Access denied!'));
+          return;
+        }
+      }
       // console.log('metafield query', queryUser || user.login);
       // todo check if visibility is set to public --> restriction if not owner
       console.log('data', foundObj, slug);
@@ -112,14 +130,14 @@ export async function handler(event, context, callback) {
         body: JSON.stringify({ dotfiles: foundObj})
       });
     } catch ({error}) {
-      // console.log("error", error);
+      console.log("error", error);
       errorHandler(callback, error);
       return;
     }
   }
 
   if (event.httpMethod === "POST") {
-    // console.log("post", event.body);
+    console.log("post", event.body);
     const api = Cosmic();
     const bucket = api.bucket({
       slug: process.env.COSMIC_SLUG,
@@ -129,8 +147,10 @@ export async function handler(event, context, callback) {
     const eventBody = JSON.parse(event.body);
     const body = eventBody.body;
     const title = eventBody.title;
+    const visibility = eventBody.visibility;
     const slug = eventBody.params.slug;
 
+    console.log('parsed', body, title, slug, user.login)
     // edit or new graph
     try {
       let data = {objects: []};
@@ -138,20 +158,24 @@ export async function handler(event, context, callback) {
       if (slug) {
         data = await bucket.searchObjectType({
           type_slug: "dotfiles",
-          slug: slug,
-          metafield_key: "ghuser",
+          // slug: slug, // --> not supported
+          metafield_key: "ghUser",
           metafield_value: user.login
         });
+        
+        data.objects = data.objects.filter(obj => obj.slug === slug);
       }
 
-      // console.log("edit", slug, body, event.body, data.objects.length);
+      console.log("edit", slug, body, event.body, data.objects.length, user.login);
+
+      console.log('objects', data.objects);
 
       if (data.objects.length === 0) {
         // add new graph
         const params = {
           title,
           content: "", // add description later
-          metafields: createMetaFieldsArray(user.login, body),
+          metafields: createMetaFieldsArray(user.login, body, visibility),
           type_slug: 'dotfiles',
           options: {
             slug_fields: false
@@ -159,7 +183,7 @@ export async function handler(event, context, callback) {
         };
         const {object: newObject} = await bucket.addObject(params);
 
-        // console.log('Added object', newObject, newObject.slug);
+        console.log('Added object', newObject, newObject.slug);
         callback(null, {
           headers: {
             "content-type": "application/json"
@@ -171,15 +195,15 @@ export async function handler(event, context, callback) {
           })
         });
       } else if (data.objects.length === 1) {
-        // todo check user === eventBody.params.user
+        // owner of dotfile
         // one object with slug & user available --> would be great if it would be possible to add user to editObject as well
         // slug is unique for all users that's why it is working
         const response = await bucket.editObject({
           slug: slug,
-          metafields: createMetaFieldsArray(eventBody.params.user, body)
+          metafields: createMetaFieldsArray(eventBody.params.user, body, visibility)
         });
 
-        // console.log("updated", response);
+        console.log("updated", response);
         callback(null, {
           headers: {
             "content-type": "application/json"
@@ -191,7 +215,7 @@ export async function handler(event, context, callback) {
         });
       }
     } catch ({error}) {
-      // console.log("error", error);
+      console.log("error", error);
       errorHandler(callback, error);
       return;
     }
