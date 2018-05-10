@@ -1,8 +1,6 @@
 <template lang="html">
   <footer>
-    Version {{version}} -
-    This app is very alpha and may change completely at any time. If you're having important graphs keep a copy of your definition in a save place.
-  </footer>
+    Version {{version}} - &copy;{{year}} A. Wolf</footer>
 </template>
 
 <script>
@@ -10,7 +8,8 @@ export default {
   data () {
     // console.log('footer', process.env)
     return {
-      version: process.env.version
+      version: process.env.version,
+      year: (new Date()).getUTCFullYear()
     }
   }
 }

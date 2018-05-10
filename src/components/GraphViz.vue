@@ -121,6 +121,7 @@
   <h4 slot="header">Delete graph</h4>
   <p slot="body">Are you sure to delete <strong>{{graphToDelete ? graphToDelete.name : ''}}</strong>? (no undo possible)</p>
 </modal>
+
 <!-- <modal title="Clear editor" :show.sync="showClear" @ok="ok" @cancel="cancel">
 Are you sure to clear the editor? (no undo)
 </modal> -->

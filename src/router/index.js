@@ -28,6 +28,16 @@ export default new Router({
           meta: { reuse: false }
         },
         {
+          path: '/i/privacy',
+          name: 'Privacy',
+          component: require('../markdown/privacy.md')
+        },
+        {
+          path: '/i/terms',
+          name: 'Terms',
+          component: require('../markdown/terms.md')
+        },
+        {
           path: '/example/:index?',
           name: 'Example',
           component: Graphviz,

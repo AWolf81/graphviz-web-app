@@ -19,7 +19,7 @@
       <ul class="nav navbar-nav">
         <!-- <li class="active"><a href="#">Link <span class="sr-only">(current)</span></a></li>-->
         <!-- <li><a href="#">Link</a></li> -->
-        <local-graph-storage :graphs="storedGraphs"></local-graph-storage>
+        <local-graph-storage :graphs="storedGraphs" v-if="!isAuthenticated"></local-graph-storage>
         <dropdown>
             <span slot="trigger">Examples <span class="caret"></span></span>
             <ul class="dropdown-menu">
@@ -69,6 +69,8 @@
           <span slot="trigger">?</span>
           <ul class="dropdown-menu">
             <li><router-link :to="{name: 'About'}">About</router-link></li>
+            <li><router-link :to="{name: 'Privacy'}">Privacy</router-link></li>
+            <li><router-link :to="{name: 'Terms'}">Terms of service</router-link></li>
             <!--<li><router-link to="/settings">Settings (tbd)</router-link></li>-->
             <!-- <li><a href="#">Another action</a></li>
             <li><a href="#">Something else here</a></li>
@@ -88,7 +90,7 @@
             </ul>
         </dropdown>
         <li v-else><a href="#" @click="login">Login</a></li>
-        <li><a href="#" @click="helloLambda">Test lambda</a></li>
+        <!-- <li><a href="#" @click="helloLambda">Test lambda</a></li> -->
       </ul>
     </div><!-- /.navbar-collapse -->
   <!-- </transition> -->

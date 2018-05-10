@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import VueLs from 'vue-ls'
 import Vuex from 'vuex'
+import axios from 'axios'
 import panZoom from './modules/panzoom'
 import auth from './modules/auth'
 import slugify from '@/helpers/slugify'
@@ -30,8 +31,19 @@ export default new Vuex.Store({
     storedGraphs: Vue.ls.get('storedGraphs') || []
   },
   actions: {
-    triggerRemoveGraph ({commit, state}) {
-      if (state.graphToDelete) {
+    async triggerRemoveGraph ({commit, state}) {
+      if (state.graphToDelete && state.graphToDelete.inCloud) {
+        // remove cloud graph
+        console.log('remove in cloud', state.graphToDelete)
+        try {
+          const slug = state.graphToDelete.slug
+          const user = state.auth.user.username
+          await axios.delete('/.netlify/functions/data/', {data: {user, slug}})
+        } catch (error) {
+          console.log('removing failed', error)
+        }
+      } else {
+        // local storage
         commit('removeGraph', state.graphToDelete)
       }
       state.showDelete = false
@@ -44,10 +56,13 @@ export default new Vuex.Store({
     },
     hideDeleteConfirm (state) {
       state.showDelete = false
-      state.graphToDelete = undefined
+      // state.graphToDelete = undefined
     },
-    showDeleteConfirm (state, graph) {
-      state.graphToDelete = graph
+    showDeleteConfirm (state, {graph, cloud}) {
+      state.graphToDelete = {
+        ...graph,
+        inCloud: cloud
+      }
       state.showDelete = true
     },
     updateGraphData (state, graph) {
