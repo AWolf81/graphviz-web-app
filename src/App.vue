@@ -14,7 +14,6 @@ export default {
     // initial load user
     const token = Vue.ls.get('token')
     if (token) {
-      console.log('token available')
       this.$store.dispatch('setHeaders')
       this.$store.dispatch('fetchUserInfo')
     }

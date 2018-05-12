@@ -16,7 +16,9 @@
             <!-- <div class="col-md-4" v-if="!isMaximizedRender" :style="{width: editorWidth}"> -->
               <nav class="navbar navbar-default">
                   <div class="navbar-header pull-left">
-                    <a class="navbar-brand">Definition</a>
+                    <a class="navbar-brand">Definition
+                      <sub><a href="#" v-if="draft" @click="showDraft = !showDraft">Show unsaved draft</a></sub>
+                    </a>
                   </div>
                   <div class="navbar-header pull-right">
                   <div class="btn-group navbar-btn" role="group" aria-label="toolbar">
@@ -122,6 +124,17 @@
   <p slot="body">Are you sure to delete <strong>{{graphToDelete ? graphToDelete.name : ''}}</strong>? (no undo possible)</p>
 </modal>
 
+<modal :show="showDraft">
+  <h4 slot="header">Unsaved draft</h4>
+  <div slot="body">
+    <p>You've missed to save your graph. Do you want to load the draft? <b>Attention!</b> Current editor data will be overwritten.</p>
+    <pre>{{draft}}</pre>
+  </div>
+  <div slot="footer">
+    <button class="btn btn-default" @click="updateGraphData({data: draft}); showDraft=false;">Load draft</button>
+    <button class="btn btn-default" @click="showDraft = false">Cancel</button></div>
+</modal>
+
 <!-- <modal title="Clear editor" :show.sync="showClear" @ok="ok" @cancel="cancel">
 Are you sure to clear the editor? (no undo)
 </modal> -->
@@ -151,12 +164,10 @@ Vue.directive('focus', {
   // When the bound element is inserted into the DOM...
   inserted (el) {
     // Focus the element (if visible)
-    // console.log('inserted', el)
     el.focus()
   },
   componentUpdated (el) {
     // support to focus in modal
-    // console.log('updated', el)
     el.focus()
   }
 })
@@ -167,9 +178,12 @@ export default {
     return {
       $editor: undefined,
       loaded: false,
+      requestId: undefined,
+      isSavedInCloud: false,
       showClear: false,
       showSave: false,
       showError: false,
+      showDraft: false,
       errorMessage: '', // app errors
       renderErrorMessage: '', // e.g. syntax error for dot
       saveName: undefined,
@@ -213,12 +227,13 @@ export default {
       'storedGraphs',
       'showDelete'
     ]),
-    ...mapGetters(['isAuthenticated'])
+    ...mapGetters(['isAuthenticated']),
+    draft () {
+      const savedDraft = Vue.ls.get('draftDot')
+      return (savedDraft !== this.localDotData && savedDraft !== '') ? savedDraft : undefined
+    }
   },
   watch: {
-    // localDotData: _.debounce(() => {
-    //   this.$store.commit('updateDotData', this.localDotData)
-    // }, 500),
     editorTheme () {
       this.setTheme(this.editorTheme)
     },
@@ -236,17 +251,7 @@ export default {
     }
   },
   mounted () {
-    console.log('graphviz editor', this.$editor, this.$route)
-    // this.loadStorage()
     this.setData()
-    console.log(this.$route, this) // todo check if id passed & route example
-
-    // setTimeout(() => {
-    //   const resizable = $('.render-panel').resizable({
-    //     direction: 'horizontal'
-    //   })
-    //   console.log('resizeable', resizable, $('.render-panel'))
-    // }, 100)
   },
   methods: {
     ...mapMutations(['updateGraphData']),
@@ -267,8 +272,6 @@ export default {
     }, 500),
     onEditorReady () {
       this.$editor = document.querySelector('.CodeMirror').CodeMirror
-
-      console.log('editor ready', this.$editor)
       this.$editor.setOption('theme', this.editorTheme)
     },
     clearGutter (name) {
@@ -280,9 +283,6 @@ export default {
 
       // Select the first item (zero index) just incase more than one found & get the CodeMirror JS object
       let codeMirrorEditor = this.$editor
-
-      // Write the item to the console window, for debugging
-      console.log(this.$editor, actualLineNumber)
 
       this.clearGutter('markers') // clear previous marker
 
@@ -301,12 +301,9 @@ export default {
       return marker
     },
     resizeRender (e) {
-      // console.log('resize', e)
-      // onResize()
       this.$store.dispatch('triggerPanzommResize')
     },
     saveTxt () {
-      console.log('save file...')
       this.setFilename()
       let element = document.createElement('a')
       element.setAttribute(
@@ -324,8 +321,6 @@ export default {
       document.body.removeChild(element)
     },
     setData () {
-      // if (this.$route.name !== 'Home') {
-      // not home --> check if index exists and render
       let index = this.$route.params.index
       let user = this.$route.params.user
       let slug = this.$route.params.slug
@@ -334,38 +329,37 @@ export default {
       if (!isNaN(index)) {
         // numeric value --> example from index
         if (example.data) {
-          // this.localDotData = example.data
-          this.updateGraphData({ data: example.data })
+          this.updateGraphData({ data: example.data, initialLoad: true })
           this.loaded = true
+          this.isSavedInCloud = false
         } else {
+          // optional load examples from url --> replaced to local data for faster loading
           this.loadData(example.url).then(data => {
-            // this.localDotData = data
-            this.updateGraphData({ data })
+            this.updateGraphData({ data, initialLoad: true })
             this.loaded = true
+            this.isSavedInCloud = false
           })
         }
       } else if (user && slug) {
         this.fetchDbData(user, slug).then(({dotfiles}) => {
-          // const fetchedData = Object.assign({}, data.dotfiles[0])
-          console.log('fetched', dotfiles)
           this.updateGraphData({
             data: dotfiles.metadata.body,
-            name: dotfiles.title
+            name: dotfiles.title,
+            initialLoad: true
           })
           this.loaded = true
+          this.isSavedInCloud = true
         })
       } else {
         // not a name --> check if query contains dot
         let url = this.$route.query.url
-        // console.log('load from url', url)
         if (url) {
           // defined but a string --> use url params to load data
-          console.log(this.$route)
           this.loadData(url)
             .then(data => {
-              // this.localDotData = data
-              this.updateGraphData({ data })
+              this.updateGraphData({ data, initialLoad: true })
               this.loaded = true
+              this.isSavedInCloud = false
             })
             .catch(err => {
               this.errorMessage = err.message
@@ -373,7 +367,6 @@ export default {
             })
         } else {
           if (this.$route.name === 'Home') {
-            // console.log('home route', this.$route)
             if (this.$route.params.slug) {
               let graph = this.storedGraphs.filter(
                 graph => graph.slug === this.$route.params.slug
@@ -386,9 +379,7 @@ export default {
                 return
               }
               // this.localDotData = graph.data
-              this.updateGraphData({ data: graph.data })
-              this.$store.commit('updateGraphData', graph)
-              // console.log('loaded graph', graph)
+              this.updateGraphData({ data: graph.data, initialLoad: true })
             } else {
               // console.log('graph query?', this.$route)
               // if (this.$route.query.graph) { //<<<<<<< too complicated to pass --> better do saving server side like at jsfiddle
@@ -401,12 +392,13 @@ export default {
               // }
             }
             this.loaded = true
+            this.isSavedInCloud = false
           } else {
             // show error
-            console.log('loaded')
             this.errorMessage = 'Couldn\'t load data. Please check your url.'
             this.showError = true
             this.loaded = true
+            this.isSavedInCloud = false
           }
         }
       }
@@ -422,7 +414,7 @@ export default {
     },
     setFilename () {
       this.saveName = this.filename
-      console.log('set filename', this.filename, this.saveName)
+      // console.log('set filename', this.filename, this.saveName)
     },
     toggleSize () {
       this.isMaximizedRender = !this.isMaximizedRender
@@ -437,19 +429,17 @@ export default {
     },
     // render error updating
     updateError (error) {
-      console.log('new error', error, this)
       this.renderErrorMessage = error
     },
     hideError () {
       this.showError = false
       this.errorMessage = ''
     },
-    loadData (url) {
+    loadData (url, requestId) {
       return axios
-        .get(`https://cors-anywhere.herokuapp.com/${url}`)
+        .get(`https://cors-anywhere.herokuapp.com/${url}`, { requestId })
         .then(response => response.data)
         .catch(response => {
-          console.log('response', response)
           this.errorMessage = response.message + ' - Please try again later.'
           this.showError = true
         })
@@ -459,23 +449,16 @@ export default {
         .get(`/.netlify/functions/data/${user}/${slug}`)
         .then(response => response.data)
         .catch(({response}) => {
-          // console.log('response', response)
           this.errorMessage = response.data.error.message
           this.showError = true
           this.loaded = true
         })
     },
-    // loadStorage () {
-    //   this.storedGraphs = this.$ls.get('storedGraphs') || []
-    // },
     clear () {
       // show modal
-      console.log('clear clicked')
       this.showClear = true
-      console.log(this.showClear)
     },
     ok () {
-      // this.localDotData = ''
       this.updateGraphData({ data: '', name: '' })
       this.showClear = false
       this.$router.push('/')
@@ -485,17 +468,15 @@ export default {
       this.showClear = false
     },
     performSave (name) {
-      console.log('save', name)
       if (!name) {
         this.errorMessage = 'Please enter a name for your graph'
         this.showError = true
-        // this.showSave = false // keep save displayed
         return
       }
 
       if (this.saveToCloud) {
-        console.log('TODO: save to cosmic.js')
         // call aws --> aws checks if name is already saved & updates data (revisions handled by cosmic)
+        // console.log('save to cloud', this.$route.params)
         axios
           .post('/.netlify/functions/data/', {
             params: this.$route.params,
@@ -504,15 +485,13 @@ export default {
             visibility: 'private'
           })
           .then(result => {
-            // console.log('result', result)
             const { redirect } = result.data
+            Vue.ls.set('draftDot', '')
             if (redirect) {
-              console.log('redirect', redirect)
               this.$router.push(redirect)
             }
           })
           .catch(err => {
-            console.log('err', err)
             this.errorMessage = err.message
             this.showError = true
           })

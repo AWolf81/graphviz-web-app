@@ -93,7 +93,7 @@ export default {
   },
   methods: {
     applyTheme (selected) {
-      console.log('apply theme', selected)
+      // console.log('apply theme', selected)
       this.$store.commit('applyEditorTheme', selected)
       // this.$emit('applytheme', selected)
     },

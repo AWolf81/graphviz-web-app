@@ -68,6 +68,10 @@ module.exports = {
         options: {
           wrapper: 'div'
         }
+      },
+      {
+        test: /\.txt$/,
+        use: 'raw-loader'
       }
     ]
   }

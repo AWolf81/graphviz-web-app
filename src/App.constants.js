@@ -1,3 +1,7 @@
+import crazy from './examples/crazy.gv.txt'
+import psg from './examples/psg.gv.txt'
+import traffic from './examples/traffic_lights.gv.txt'
+
 export const DEFAULT_CODEMIRROR_THEME = 'default'
 export const DEFAULT_EXPORT_NAME = 'diagram'
 export const examples = [
@@ -38,16 +42,19 @@ export const examples = [
   {
     id: 2,
     caption: 'Crazy',
-    url: 'https://graphviz.gitlab.io/_pages/Gallery/directed/crazy.gv.txt'
+    data: crazy
+    // url: 'https://graphviz.gitlab.io/_pages/Gallery/directed/crazy.gv.txt'
   }, {
     id: 3,
     caption: 'PSG',
-    url: 'https://graphviz.gitlab.io/_pages/Gallery/directed/psg.gv.txt'
+    data: psg
+    // url: 'https://graphviz.gitlab.io/_pages/Gallery/directed/psg.gv.txt'
   },
   {
     id: 4,
     caption: 'Traffic lights', // loaded via ajax --> huge definition
-    url: 'https://graphviz.gitlab.io/_pages/Gallery/directed/traffic_lights.gv.txt'
+    data: traffic
+    // url: 'https://graphviz.gitlab.io/_pages/Gallery/directed/traffic_lights.gv.txt'
   },
   {
     id: 5,

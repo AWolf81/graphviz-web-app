@@ -32,21 +32,17 @@ export default new Vuex.Store({
   },
   actions: {
     async triggerRemoveGraph ({commit, state}) {
+      state.showDelete = false
       if (state.graphToDelete && state.graphToDelete.inCloud) {
         // remove cloud graph
-        console.log('remove in cloud', state.graphToDelete)
-        try {
-          const slug = state.graphToDelete.slug
-          const user = state.auth.user.username
-          await axios.delete('/.netlify/functions/data/', {data: {user, slug}})
-        } catch (error) {
-          console.log('removing failed', error)
-        }
+        // console.log('remove in cloud', state.graphToDelete)
+        const slug = state.graphToDelete.slug
+        const user = state.auth.user.username
+        return axios.delete(`/.netlify/functions/data/${user}/${slug}`)
       } else {
         // local storage
         commit('removeGraph', state.graphToDelete)
       }
-      state.showDelete = false
     }
   },
   mutations: {
@@ -65,15 +61,15 @@ export default new Vuex.Store({
       }
       state.showDelete = true
     },
-    updateGraphData (state, graph) {
-      state.dotData = graph.data // used to update data from editor
-      if (graph.data !== '') {
-        // avoid clearing of draft
-        Vue.ls.set('draftDot', graph.data) // always save as draft
+    updateGraphData (state, {data, name, initialLoad}) {
+      state.dotData = data // used to update data from editor
+      if (data !== '' && !initialLoad) {
+        // avoid clearing of draft & avoid overwriting draft on cloud load
+        Vue.ls.set('draftDot', data) // always save as draft
       }
-      if (graph.name || graph.name === '') { // name optional / empty to clear
-        console.log('new filename', graph.name)
-        state.filename = graph.name
+      if (name || name === '') { // name optional / empty to clear
+        // console.log('new filename', graph.name)
+        state.filename = name
       }
     },
     saveGraph (state, name) {

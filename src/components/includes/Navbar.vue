@@ -39,26 +39,37 @@
           </dropdown>
       </ul>
       <ul class="nav navbar-nav navbar-right">
-        <dropdown>
+        <dropdown v-if="isShareable">
           <span slot="trigger">Share</span>
           <social-sharing 
             :url="currentPage()" 
             inline-template 
             hashtags="GraphvizWebApp,javascript"
-            network-tag="a">
+            network-tag="a"
+            @copy="copyToClipboard"
+            @change-visibility="changeVisibility('public')">
             <ul class="dropdown-menu">
+              <li>
+                <small>
+                  <i class="fa fa-info-circle"></i> Share Info<br/>
+                  By clicking any share button below your graph will be made publically available to anybody with the link (no login required). This permission can be revoked in your dashboard.
+                </small>
+              </li>
                 <!-- <li>
                   <network network="facebook">
                     <i class="fa fa-fw fa-facebook"></i> Facebook
                   </network>
                 </li> -->
+                <li @click="() => $emit('copy')">
+                  <a href="#">Copy url to clipboard</a>
+                </li>
                 <li>
-                  <network network="linkedin">
+                  <network network="linkedin" @open="() => $emit('changeVisibility')">
                     <i class="fa fa-fw fa-linkedin"></i> LinkedIn
                   </network>
                 </li>
                 <li>
-                  <network network="twitter">
+                  <network network="twitter" @open="() => $emit('changeVisibility')">
                     <i class="fa fa-fw fa-twitter"></i> Twitter
                   </network>
                 </li>
@@ -107,6 +118,7 @@ import dropdown from '@/components/Dropdown.vue'
 import Headroom from 'headroom.js'
 import Netlify from 'netlify-auth-providers'
 import axios from 'axios'
+import {copyTextToClipboard} from '../../helpers/copyToClipboard'
 
 export default {
   mixins: [
@@ -121,9 +133,14 @@ export default {
     ...mapState({
       user: state => state.auth.user
     }),
-    ...mapGetters(['isAuthenticated'])
+    ...mapGetters(['isAuthenticated']),
+    isShareable () {
+      console.log('share check cloud', this.$route.params)
+      return (this.$route.params.user && this.$route.params.slug)
+    }
   },
   data () {
+    console.log('data', this.copyToClipboard)
     return {
       headroom: undefined,
       examples,
@@ -132,6 +149,22 @@ export default {
   },
   methods: {
     ...mapMutations(['updateGraphData']),
+    changeVisibility (newVisibility) {
+      // @todo --> check if other user wants to share public graph (no setting visibility required)
+      return axios.post('/.netlify/functions/data/', {
+        params: this.$route.params,
+        visibility: newVisibility
+      }).catch(error => {
+        console.log(error)
+      })
+    },
+    copyToClipboard () {
+      // console.log('copy')
+      if (this.user) {
+        this.changeVisibility('public')
+      }
+      copyTextToClipboard(window.location.href)
+    },
     currentPage () {
       return window.location.href
     },
@@ -206,6 +239,7 @@ export default {
 img {
   width: 30px;
   height: 30px;
+  margin-top: -4px;
 }
 
 </style>

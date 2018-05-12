@@ -47,38 +47,17 @@
 </template>
 
 <script>
-import { mapState, mapMutations, mapActions } from 'vuex'
+import { mapState, mapMutations } from 'vuex'
 import modal from './Modal.vue'
-// import gql from 'graphql-tag'
 import axios from 'axios'
 import {formatDate} from '../helpers/date'
-// import localGraphStorage from './LocalGraphStorage'
-// import Cosmic from 'cosmicjs'
 
 export default {
-  /*
-  apollo: {
-    // Simple query that will update the 'hello' vue property
-    hello: gql`{objects: objectsByType(bucket_slug: "8daee320-4d88-11e8-a743-1fe133019f0d", read_key: "I24grSLDE1eiKrPEn2qIcTGX6kUhpRgec7MbZDGSx2gIbHfzfh", limit: 4, type_slug: "dotfiles") {
-            title
-            type_slug
-        }
-    }`
-  }, */
   components: {
     modal
   },
   async created () {
-    /*
-    // direct fetch
-    const api = Cosmic()
-    const bucket = api.bucket({
-      slug: '8daee320-4d88-11e8-a743-1fe133019f0d'
-    })
-    const data = await bucket.getObjects()
-    console.log('data', data) */
     const {data} = await axios.get('/.netlify/functions/data')
-    console.log(data)
     this.dotfiles = data.dotfiles
     this.loadingDotfiles = false
   },
@@ -105,9 +84,15 @@ export default {
     ...mapMutations({
       cancelDelete: 'hideDeleteConfirm'
     }),
-    ...mapActions({
-      deleteGraph: 'triggerRemoveGraph'
-    })
+    deleteGraph () {
+      this.$store.dispatch('triggerRemoveGraph').then(() => {
+        if (this.graphToDelete.inCloud) {
+          const dot = this.dotfiles.filter(dot => dot._id === this.graphToDelete._id)[0]
+          const index = this.dotfiles.indexOf(dot)
+          this.dotfiles.splice(index, 1)
+        }
+      }).catch((err) => console.log(err))
+    }
   }
 }
 </script>

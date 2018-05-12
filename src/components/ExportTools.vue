@@ -75,16 +75,16 @@
             exportArea.replaceWith(svg)
           }
           let graphBox = graph.getBoundingClientRect() // .getClientRects()[0] // getBBox()
-          console.log('graphbox', graphBox)
+          // console.log('graphbox', graphBox)
           svg.setAttribute('width', this.scale * graphBox.width)
           svg.setAttribute('height', this.scale * graphBox.height)
           svg.setAttribute('viewBox', `0 0 ${this.scale * graphBox.width} ${this.scale * graphBox.height}`)
           svg.setAttribute('transform', `scale(${this.scale})`)
-          console.log('svg size', graphBox.width, graphBox.height, svg.getBoundingClientRect())
+          // console.log('svg size', graphBox.width, graphBox.height, svg.getBoundingClientRect())
           return graphBox // svg.getClientRects()[0] // getBoundingClientRect() // getClientRects()[0]
         },
         hideDropdown () {
-          console.log('hide')
+          // console.log('hide')
           this.showExportSettings = false
           if (document.querySelector('#exportSVG svg')) {
             document.querySelector('#exportSVG svg').outerHTML = ''
@@ -104,7 +104,7 @@
           return `${width} x ${height} px`
         },
         scaleChanged: _.debounce(function () {
-          console.log('save new scale debouced')
+          // console.log('save new scale debouced')
           // save scale in localstorage
           // later saved related to current url id/name
           this.$ls.set('settings', { // todo add object assign later for more settings

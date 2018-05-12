@@ -26,7 +26,7 @@ export default {
   methods: {
     // whenever the document is resized, re-set the 'fullHeight' variable
     handleResize (event) {
-      console.log('resize', document.documentElement.clientWidth)
+      // console.log('resize', document.documentElement.clientWidth)
       this.screenWidth = document.documentElement.clientWidth
     }
   }

@@ -5,7 +5,7 @@ import store from '@/store'
 import eventsHandler from './EventsHandler'
 
 function onResize () {
-  console.log('resized')
+  // console.log('resized')
   let panZoom = store.state.panZoom.instance
   setTimeout(() => {
     // delayed for maximize event
@@ -13,51 +13,20 @@ function onResize () {
     // panZoom.center()
     panZoom.reset()
     panZoom.resize()
-    console.log('updated panZoom')
+    // console.log('updated panZoom')
     // store.commit('updateSVGSize', document.querySelector('svg').getBBox())
   }, 500)
 }
 
 function onPan (newPan) {
-  console.log(this, newPan)
+  // console.log(this, newPan)
   store.commit('updatePan', newPan)
-  // this.state.panPos = newPan
 }
 
 function onZoom (newZoom) {
-  console.log(this, newZoom)
-  // this.zoomPos = newZoom77
+  // console.log(this, newZoom)
   store.commit('updateZoom', newZoom)
-  // this.state.panZoom = newZoom
 }
-
-// function save (cb) {
-//   console.log('saving svg as png')
-//   let panZoomInstance = store.state.panZoom.instance
-//   let savedZoom = panZoomInstance.getZoom()
-//   let savedPan = panZoomInstance.getPan()
-//
-//   panZoomInstance.disableControlIcons()
-//   panZoomInstance.resetZoom()
-//   // panZoomInstance.resetPan()
-//   panZoomInstance.pan({x: 0, y: 0})
-//
-//   // console.log('svg prepared', document.querySelector('svg'))
-//   setTimeout(() => {
-//     let svg = document.querySelector('svg')
-//     let bBox = svg.getBBox()
-//
-//     // a bit hacky, but with-out it the size was incorrect
-//     svg.setAttribute('width', bBox.width + bBox.x)
-//     svg.setAttribute('height', bBox.height + bBox.y)
-//
-//     console.log('svg to save', bBox, svg.getBBox())
-//     cb(svg)
-//     panZoomInstance.zoom(savedZoom)
-//     panZoomInstance.pan(savedPan)
-//     panZoomInstance.enableControlIcons()
-//   }, 1000)
-// }
 
 export default {
   state: {
@@ -71,21 +40,6 @@ export default {
       onResize()
     }
   },
-  // actions: {
-  //   saveAsSvg ({commit, state}) {
-  //     save((svg) => {
-  //       // svg save callback
-  //       saveSvg(svg, 'diagram.svg')
-  //     })
-  //   },
-  //   saveAsPng ({commit, state}, scale) {
-  //     // commit
-  //     save((svg) => {
-  //       // png save callback
-  //       saveSvgAsPng(svg, 'svg.png', {scale})
-  //     })
-  //   }
-  // },
   mutations: {
     createPanZoom (state) {
       // svg must be rendered before!!!
@@ -117,7 +71,7 @@ export default {
     },
     disableControls (state) {
       let panZoom = state.instance
-      console.log('disableControls', panZoom)
+      // console.log('disableControls', panZoom)
       panZoom.resize()
       panZoom.disableControlIcons()
     },

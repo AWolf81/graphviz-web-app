@@ -42,7 +42,6 @@ export default {
   methods: {
     formatDate,
     show (graph) {
-      console.log('show graph', graph.name)
       if (graph.slug) {
         this.$router.push({name: 'Home',
           params: {
@@ -54,7 +53,6 @@ export default {
 
       // below is kept to be backwards compatible
       if (this.$route.name !== 'Home') {
-        console.log('redirect', this.$route.name)
         // ensure that we're having the correct view
         this.$router.push('/')
       }
@@ -66,7 +64,6 @@ export default {
       this.$store.commit('showDeleteConfirm', graph)
     },
     triggerNanoscroller () {
-      console.log('trigger scroller')
       setTimeout(() =>
         $('.nano').nanoScroller({ flash: true })
       , 50)

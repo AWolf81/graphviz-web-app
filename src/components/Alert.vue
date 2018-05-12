@@ -32,7 +32,7 @@ export default {
   },
   mounted () {
     this.dismissed = !!Vue.ls.get('alert-' + this.id)
-    console.log('alert', this.id, this.dismissed)
+    // console.log('alert', this.id, this.dismissed)
   }
 }
 </script>

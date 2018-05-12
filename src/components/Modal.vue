@@ -36,7 +36,6 @@
 export default {
   props: ['show'],
   data () {
-    console.log('modal init', this.show)
     return {
       displayModal: this.show
     }
@@ -65,7 +64,7 @@ export default {
 
 <style lang="css">
 .modal-mask {
-  position: fixed;
+  position: absolute;
   z-index: 9998;
   top: 0;
   left: 0;
@@ -82,7 +81,7 @@ export default {
 }
 
 .modal-container {
-  width: 300px;
+  width: 50vw;
   margin: 0px auto;
   padding: 20px 30px;
   background-color: #fff;
@@ -126,5 +125,14 @@ export default {
 .modal-leave-active .modal-container {
   -webkit-transform: scale(1.1);
   transform: scale(1.1);
+}
+
+@media (max-width:801px)  { 
+  /* tablet, landscape iPad, lo-res laptops ands desktops */
+  /* enlarge modal if screen gets to a smaller size */
+  .modal-container {
+    /* ideally 100vw but above 90vw it adds a horizontal scrollbar */
+    width: 90vw;
+  }
 }
 </style>

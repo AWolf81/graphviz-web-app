@@ -64,7 +64,7 @@ export default {
       return `${this.animationClass} ${className}`
     },
     toggle () {
-      console.log('toggle dropdown')
+      // console.log('toggle dropdown')
       this.visible = !this.visible
     },
     showDropdown () {
