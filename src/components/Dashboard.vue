@@ -15,6 +15,7 @@
                     <h3>{{dot.title}}</h3>
                     <p><span v-html="dot.content"></span>last modified: {{formatDate(dot.modified_at)}}</p>
                     <button class="btn btn-danger" @click.prevent="showDeleteConfirm(dot, true)">Delete</button>
+                    Visibility: <visibility :visibility="dot.metadata.visibility" @toggle="toggleVisibility(dot.metadata.visibility)"/>
                     <!--<pre>{{dot}}</pre>-->
                 </router-link>
               </div>
@@ -47,14 +48,16 @@
 </template>
 
 <script>
-import { mapState, mapMutations } from 'vuex'
+import { mapState, mapMutations, mapActions } from 'vuex'
 import modal from './Modal.vue'
+import visibility from './Visibility.vue'
 import axios from 'axios'
 import {formatDate} from '../helpers/date'
 
 export default {
   components: {
-    modal
+    modal,
+    visibility
   },
   async created () {
     const {data} = await axios.get('/.netlify/functions/data')
@@ -84,6 +87,7 @@ export default {
     ...mapMutations({
       cancelDelete: 'hideDeleteConfirm'
     }),
+    ...mapActions(['changeVisibility']),
     deleteGraph () {
       this.$store.dispatch('triggerRemoveGraph').then(() => {
         if (this.graphToDelete.inCloud) {
@@ -92,6 +96,10 @@ export default {
           this.dotfiles.splice(index, 1)
         }
       }).catch((err) => console.log(err))
+    },
+    toggleVisibility (visibility) {
+      const newVisibility = visibility === 'private' ? 'public' : 'private'
+      this.changeVisibility({params: this.$route.params, newVisibility})
     }
   }
 }

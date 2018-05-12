@@ -25,6 +25,7 @@ export default new Vuex.Store({
       ## b to c and back to a
       b -> c -> a;
     }`,
+    visibility: undefined, // private or public for cloud stored dots
     graphToDelete: undefined,
     editorTheme: Vue.ls.get('editorTheme') || DEFAULT_CODEMIRROR_THEME,
     showDelete: false,
@@ -43,6 +44,23 @@ export default new Vuex.Store({
         // local storage
         commit('removeGraph', state.graphToDelete)
       }
+    },
+    changeVisibility ({commit, state}, {params, newVisibility}) {
+      console.log('change vis', state.visibility, newVisibility)
+      if (state.visibility === newVisibility) {
+        return // already set
+      }
+      // @todo --> check if other user wants to share public graph (no setting visibility required)
+      return axios.post('/.netlify/functions/data/', {
+        params: params,
+        visibility: newVisibility
+      }).then((res) => {
+        console.log('changed vis', res)
+        commit('setVisibility', newVisibility)
+      })
+      .catch(error => {
+        console.log(error)
+      })
     }
   },
   mutations: {
@@ -61,8 +79,13 @@ export default new Vuex.Store({
       }
       state.showDelete = true
     },
-    updateGraphData (state, {data, name, initialLoad}) {
+    setVisibility (state, newVisibility) {
+      state.visibility = newVisibility
+    },
+    updateGraphData (state, {data, name, initialLoad, visibility}) {
       state.dotData = data // used to update data from editor
+      state.visibility = visibility
+
       if (data !== '' && !initialLoad) {
         // avoid clearing of draft & avoid overwriting draft on cloud load
         Vue.ls.set('draftDot', data) // always save as draft

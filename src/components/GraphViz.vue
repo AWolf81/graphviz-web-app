@@ -18,6 +18,7 @@
                   <div class="navbar-header pull-left">
                     <a class="navbar-brand">Definition
                       <sub><a href="#" v-if="draft" @click="showDraft = !showDraft">Show unsaved draft</a></sub>
+                      <visibility :visibility="visibility" @toggle="toggleVisibility"/>
                     </a>
                   </div>
                   <div class="navbar-header pull-right">
@@ -144,7 +145,7 @@ Are you sure to clear the editor? (no undo)
 <script>
 import Vue from 'vue'
 import axios from 'axios'
-import { mapState, mapMutations, mapGetters } from 'vuex'
+import { mapState, mapMutations, mapGetters, mapActions } from 'vuex'
 import _ from 'lodash'
 import { codemirror } from 'vue-codemirror'
 import themeSelect from './CodeMirrorThemeSelect.vue'
@@ -155,6 +156,7 @@ import exportTools from './ExportTools.vue'
 import modal from './Modal.vue'
 import spinner from './Spinner.vue'
 import alert from './Alert.vue'
+import visibility from './Visibility.vue'
 import { Multipane, MultipaneResizer } from 'vue-multipane'
 import '@/helpers/loadCodemirrorThemes.js'
 import pageBreakMixin from '@/mixins/PageBreak'
@@ -214,7 +216,8 @@ export default {
     Multipane,
     MultipaneResizer,
     spinner,
-    themeSelect
+    themeSelect,
+    visibility
   },
   computed: {
     ...mapState({
@@ -225,7 +228,8 @@ export default {
       'filename',
       'graphToDelete',
       'storedGraphs',
-      'showDelete'
+      'showDelete',
+      'visibility'
     ]),
     ...mapGetters(['isAuthenticated']),
     draft () {
@@ -255,6 +259,7 @@ export default {
   },
   methods: {
     ...mapMutations(['updateGraphData']),
+    ...mapActions(['changeVisibility']),
     cancelDelete () {
       this.$store.commit('hideDeleteConfirm')
     },
@@ -345,6 +350,7 @@ export default {
           this.updateGraphData({
             data: dotfiles.metadata.body,
             name: dotfiles.title,
+            visibility: dotfiles.metadata.visibility,
             initialLoad: true
           })
           this.loaded = true
@@ -426,6 +432,10 @@ export default {
           ),
         0
       )
+    },
+    toggleVisibility () {
+      const newVisibility = this.visibility === 'private' ? 'public' : 'private'
+      this.changeVisibility({params: this.$route.params, newVisibility})
     },
     // render error updating
     updateError (error) {

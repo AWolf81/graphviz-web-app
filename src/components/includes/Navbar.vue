@@ -47,7 +47,7 @@
             hashtags="GraphvizWebApp,javascript"
             network-tag="a"
             @copy="copyToClipboard"
-            @change-visibility="changeVisibility('public')">
+            @change-visibility="changeVisibility({params: $route.params, newVisibility: 'public'})">
             <ul class="dropdown-menu">
               <li>
                 <small>
@@ -111,7 +111,7 @@
 
 <script>
 import {mixin as clickaway} from 'vue-clickaway'
-import {mapState, mapMutations, mapGetters} from 'vuex'
+import {mapState, mapMutations, mapGetters, mapActions} from 'vuex'
 import { examples } from '../../App.constants'
 import localGraphStorage from '@/components/LocalGraphStorage.vue'
 import dropdown from '@/components/Dropdown.vue'
@@ -129,7 +129,7 @@ export default {
     dropdown
   },
   computed: {
-    ...mapState(['storedGraphs', 'dotData']),
+    ...mapState(['storedGraphs', 'dotData', 'visibility']),
     ...mapState({
       user: state => state.auth.user
     }),
@@ -148,16 +148,8 @@ export default {
     }
   },
   methods: {
-    ...mapMutations(['updateGraphData']),
-    changeVisibility (newVisibility) {
-      // @todo --> check if other user wants to share public graph (no setting visibility required)
-      return axios.post('/.netlify/functions/data/', {
-        params: this.$route.params,
-        visibility: newVisibility
-      }).catch(error => {
-        console.log(error)
-      })
-    },
+    ...mapMutations(['updateGraphData', 'setVisibility']),
+    ...mapActions(['changeVisibility']),
     copyToClipboard () {
       // console.log('copy')
       if (this.user) {
