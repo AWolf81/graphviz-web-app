@@ -9,7 +9,7 @@ import request from 'request-promise';
 require('dotenv').config()
 
 function createMetaFieldsArray(user, body, visibility) {
-  console.log('metafields', user, body, visibility)
+  // console.log('metafields', user, body, visibility)
   return [{
     title: "Github user",
     key: "ghUser",
@@ -43,37 +43,50 @@ Notes:
 - Use successHandler callback
 - Work with closures to avoid passing event & callback around
 */
-export async function handler(event, context, callback) {
 
-  const api = Cosmic();
-  const readBucket = api.bucket({
+// consts here can be re-used by multiple lambda invokations
+const api = Cosmic();
+const readBucket = api.bucket({
     slug: process.env.COSMIC_SLUG,
     read_key: process.env.COSMIC_READ_KEY
   });
-  const writeBucket = api.bucket({
-    slug: process.env.COSMIC_SLUG,
-    write_key: process.env.COSMIC_WRITE_KEY
-  });
+const writeBucket = api.bucket({
+  slug: process.env.COSMIC_SLUG,
+  write_key: process.env.COSMIC_WRITE_KEY
+});
+
+/*
+ bug:
+ 2nd callback with undefined triggered and throwing an error message 'UnhandledPromiseRejectionWarning:'
+ Exception in serve.js because lambdaResponse.statusCode is undefinded
+ - why is it triggered?
+
+*/
+export async function handler(event, context, callback) {
+  // console.log('lambda start', event);
+  const httpMethod = event.httpMethod;
   let user;
   let token;
   let queryUser
   let slug;
-  const httpMethod = event.httpMethod;
-  const isGET = httpMethod === 'GET';
 
   // ==================== default callbacks ==================================== 
-  function errorHandler(error = new Error('Internal error'), statusCode = 200) {
+  function errorHandler(error, statusCode) {
     // console.log('error', error);
-    callback(null, {
+    error = error || new Error('Internal error');
+    statusCode = statusCode || 500;
+
+    callback({
       headers: {
         "content-type": "application/json"
       },
-      statusCode,
+      statusCode: statusCode,
       body: JSON.stringify(error)
     });
   }
 
   function successHandler(body) {
+    // console.log('success')
     callback(null, {
       headers: {
         "content-type": "application/json"
@@ -96,13 +109,13 @@ export async function handler(event, context, callback) {
         json: true
       }); // get auth user,
   
+      return user;
       // console.log('user response', response, event)
-    } catch ({error}) {
-      // console.log("error", error);
-      errorHandler(callback, error);
-      return;
+    } catch (error) {
+      // console.log("error github req", error);
+      // errorHandler(error);
+      return error;
     }
-    return user;
   }
 
   function filterDotfiles(data) {
@@ -187,7 +200,10 @@ export async function handler(event, context, callback) {
     token = event.headers.authorization;
     if (token) {
       user = await getUser()
-      if (!user) return; // error handled in getUser - just exit here
+      if (user && user.error) {
+        errorHandler(user.error); // error in getUser
+        return;   
+      }
     }
     
     return true;
@@ -196,7 +212,9 @@ export async function handler(event, context, callback) {
 
   // ====== pre-check & preparation of request ======
   const checkResult = await preCheck();
-  if (!checkResult) return;
+  if (!checkResult) {
+    return;
+  }
 
   const pathParams = getPathValues();
   queryUser = pathParams && pathParams.queryUser;
@@ -286,7 +304,7 @@ export async function handler(event, context, callback) {
             msg: "Successfully updated"
           });
         }
-      } catch ({error}) {
+      } catch (error) {
         errorHandler(error);
       }
     },
@@ -304,12 +322,20 @@ export async function handler(event, context, callback) {
         await writeBucket.deleteObject({
           slug
         })
-        successHandler({msg: 'Object deleted', slug})
+        successHandler({msg: 'Object deleted', slug});
       } catch(error) {
         errorHandler(error);
       }
     }
   }
   
-  handlers[httpMethod]();
+  console.log('about to handle httpMethod', httpMethod);
+  if (Object.keys(handlers).indexOf(httpMethod) !== -1) {
+    await handlers[httpMethod]();
+  } else {
+    errorHandler({error: 'Not handled: ' + httpMethod}, 404);
+  }
+
+  console.log('exiting');
+  // callback(null)
 }
