@@ -1,5 +1,5 @@
 <template>
-    <a href="#" class="btn btn-default" @click.prevent="$emit('toggle')">
+    <a href="#" class="btn btn-default" @click.prevent="$emit('toggle')" :disabled="disabled">
         <i class="fa"
             :class="{'fa-eye-slash': visibility === 'private', 'fa-eye': visibility === 'public'}" 
             :title="`Visibility: ${visibility}`"></i>
@@ -9,7 +9,8 @@
 <script>
 export default {
   props: [
-    'visibility'
+    'visibility',
+    'disabled'
   ]
 }
 </script>

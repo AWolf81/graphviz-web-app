@@ -129,9 +129,10 @@ export default {
     dropdown
   },
   computed: {
-    ...mapState(['storedGraphs', 'dotData', 'visibility']),
+    ...mapState(['storedGraphs', 'dotData']),
     ...mapState({
-      user: state => state.auth.user
+      user: state => state.auth.user,
+      visibility: state => state.dotMeta.visibility
     }),
     ...mapGetters(['isAuthenticated']),
     isShareable () {
@@ -153,7 +154,7 @@ export default {
     copyToClipboard () {
       // console.log('copy')
       if (this.user) {
-        this.changeVisibility('public')
+        this.changeVisibility({params: this.$route.params, newVisibility: 'public'})
       }
       copyTextToClipboard(window.location.href)
     },

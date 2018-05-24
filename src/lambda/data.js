@@ -2,6 +2,7 @@ import Cosmic from "cosmicjs";
 import pathToRegex from 'path-to-regexp'; 
 import CryptoJS from 'crypto-js';
 import request from 'request-promise';
+import slug from 'slug';
 
 // import vandium from 'vandium'
 // const vandium = require( 'vandium' );
@@ -47,9 +48,9 @@ Notes:
 // consts here can be re-used by multiple lambda invokations
 const api = Cosmic();
 const readBucket = api.bucket({
-    slug: process.env.COSMIC_SLUG,
-    read_key: process.env.COSMIC_READ_KEY
-  });
+  slug: process.env.COSMIC_SLUG,
+  read_key: process.env.COSMIC_READ_KEY
+});
 const writeBucket = api.bucket({
   slug: process.env.COSMIC_SLUG,
   write_key: process.env.COSMIC_WRITE_KEY
@@ -64,19 +65,32 @@ const writeBucket = api.bucket({
 */
 export async function handler(event, context, callback) {
   // console.log('lambda start', event);
+  context.callbackWaitsForEmptyEventLoop = false;
+  console.log('lambda start', context, event);
+
   const httpMethod = event.httpMethod;
   let user;
   let token;
   let queryUser
   let slug;
+  // let callbackCalled = false // just a test -> UnhandledPromiseRejectionWarning in console even with callbackOnce
 
-  // ==================== default callbacks ==================================== 
+  // ==================== default callbacks ====================================
+  // function callbackOnce(error, statusCode) {
+  //   // just one callback per handler allowed
+  //   if (!callbackCalled) {
+  //     console.log('call callback');
+  //     callback(error, statusCode);
+  //     callbackCalled = true;
+  //   }
+  // }
+
   function errorHandler(error, statusCode) {
     // console.log('error', error);
     error = error || new Error('Internal error');
     statusCode = statusCode || 500;
 
-    callback({
+    callback(null, {
       headers: {
         "content-type": "application/json"
       },
@@ -213,7 +227,7 @@ export async function handler(event, context, callback) {
   // ====== pre-check & preparation of request ======
   const checkResult = await preCheck();
   if (!checkResult) {
-    return;
+    return callback(null);
   }
 
   const pathParams = getPathValues();
@@ -234,6 +248,9 @@ export async function handler(event, context, callback) {
       });
 
       let foundObj = filterDotfiles(data); // also handles decrypt --> check if it's better to separate (OK, for now as we're having it only here)
+      if (foundObj === undefined) {
+        return;
+      }
       successHandler({dotfiles: foundObj});
     },
     POST: async () => {
@@ -248,7 +265,7 @@ export async function handler(event, context, callback) {
       const visibility = eventBody.visibility;
       slug = eventBody.params.slug;
 
-      // console.log('parsed', body, title, slug, user.login)
+      console.log('parsed', body, title, slug, user.login)
       // edit or new graph
       try {
         let data = {objects: []};
@@ -266,9 +283,10 @@ export async function handler(event, context, callback) {
 
         // console.log("edit", slug, body, event.body, data.objects.length, user && user.login);
         // console.log('objects', data.objects);
+        const foundTitle = data.objects.length === 1 ? data.objects[0].title : ''
 
-        if (data.objects.length === 0) {
-          // add new graph
+        if (data.objects.length === 0 || (title !== undefined && title !== foundTitle)) {
+          // add new graph - not found or title changed - saveAs
           const params = {
             title,
             content: "", // add description later
@@ -290,9 +308,10 @@ export async function handler(event, context, callback) {
           // one object with slug & user available --> would be great if it would be possible to add user to editObject as well
           // slug is unique for all users that's why it is working
           const metadata = data.objects[0].metadata; // just if we're not changing the data --> default value
+          
           const response = await writeBucket.editObject({ // possible improvement for Cosmic.js --> just edit the fields that are passed & not replace the whole object
             slug: slug,
-            title: title || data.title,
+            title: title || data.objects[0].title,
             options: {
               slug_fields: false
             },
@@ -304,7 +323,7 @@ export async function handler(event, context, callback) {
             msg: "Successfully updated"
           });
         }
-      } catch (error) {
+      } catch ({error}) {
         errorHandler(error);
       }
     },
@@ -313,6 +332,7 @@ export async function handler(event, context, callback) {
       // const eventBody = JSON.parse(event.body);
       // slug = eventBody.slug;
 
+      console.log('delete', slug)
       if (user.login !== queryUser) {
         errorHandler({error: 'Only owner can delete'}, 401);
         return;
@@ -329,7 +349,7 @@ export async function handler(event, context, callback) {
     }
   }
   
-  console.log('about to handle httpMethod', httpMethod);
+  // console.log('about to handle httpMethod', httpMethod);
   if (Object.keys(handlers).indexOf(httpMethod) !== -1) {
     await handlers[httpMethod]();
   } else {

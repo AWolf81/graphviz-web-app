@@ -15,7 +15,8 @@
                     <h3>{{dot.title}}</h3>
                     <p><span v-html="dot.content"></span>last modified: {{formatDate(dot.modified_at)}}</p>
                     <button class="btn btn-danger" @click.prevent="showDeleteConfirm(dot, true)">Delete</button>
-                    Visibility: <visibility :visibility="dot.metadata.visibility" @toggle="toggleVisibility(dot.metadata.visibility)"/>
+                    Visibility: <visibility :visibility="dot.metadata.visibility" 
+                      @toggle="toggleVisibility(dot.metadata.visibility, {user: dot.metadata.ghUser, slug: dot.slug})"/>
                     <!--<pre>{{dot}}</pre>-->
                 </router-link>
               </div>
@@ -97,9 +98,21 @@ export default {
         }
       }).catch((err) => console.log(err))
     },
-    toggleVisibility (visibility) {
+    toggleVisibility (visibility, params) {
       const newVisibility = visibility === 'private' ? 'public' : 'private'
-      this.changeVisibility({params: this.$route.params, newVisibility})
+      const getVisibility = () => this.dotfiles.filter(dot => dot.slug === params.slug)[0]
+      const oldVisibility = `${getVisibility().metadata.visibility}`
+      // toggle value in dotfiles array (before getting the result from db)
+      getVisibility().metadata.visibility = newVisibility
+
+      this.changeVisibility({params: params, newVisibility})
+        .then(({status, message, dotfile}) => {
+          console.log('toggled', status, message)
+        })
+        .catch(() => {
+          // revert change --> later show error message
+          getVisibility().metadata.visibility = oldVisibility
+        })
     }
   }
 }

@@ -5,7 +5,7 @@
         <strong>DrawViz</strong> is using Graphviz to create a graph from a specification written as text. <br/>
             It's like markdown but for creating graphs.
             Check-out the links <router-link to="/i/about">here</router-link> or the examples to learn more about it.
-          <p><small>This app is using cookies for user traffic tracking. By closing this message you're accepting the usage. Don't like tracking - click <a href="javascript:gaDisableTracking()">here</a> to disable.</small></p>
+          <p><small>This app is using cookies for user traffic tracking. By closing this message you're accepting the usage. Don't like tracking - click <a href="javascript:gaDisableTracking(); alert('Tracking disabled.');">here</a> to disable.</small></p>
       </alert>
       <div class="row" v-if="loaded">
 
@@ -18,7 +18,11 @@
                   <div class="navbar-header pull-left">
                     <a class="navbar-brand">Definition
                       <sub><a href="#" v-if="draft" @click="showDraft = !showDraft">Show unsaved draft</a></sub>
-                      <visibility :visibility="visibility" @toggle="toggleVisibility"/>
+                      <visibility :visibility="dotMeta.visibility" @toggle="toggleVisibility" v-if="isAuthenticated && dotMeta.visibility" :disabled="$store.state.auth.user.username !== dotMeta.ghUser"/>
+                      <small>
+                        <span v-if="saveInProgess">saving...</span>
+                        <span v-else>{{editorStatusText}}</span>
+                      </small>
                     </a>
                   </div>
                   <div class="navbar-header pull-right">
@@ -47,6 +51,7 @@
                               Download textfile
                             </a>
                             <a href="#" class="list-group-item" v-if="isAuthenticated" @click.prevent="openSave()">Save locally</a>
+                            <a href="#" class="list-group-item" v-if="isAuthenticated" @click.prevent="openSave(true, false)">Save As (cloud)</a>
                           </div>
                         </div>
                       </dropdown>
@@ -190,7 +195,8 @@ export default {
       renderErrorMessage: '', // e.g. syntax error for dot
       saveName: undefined,
       saveToCloud: undefined, // if true --> save to cloud
-      saveReady: false,
+      saveInProgess: false,
+      editorStatusText: '',
       controlIconsEnabled: true,
       currentTheme: '',
       editorWidth: 200,
@@ -229,7 +235,7 @@ export default {
       'graphToDelete',
       'storedGraphs',
       'showDelete',
-      'visibility'
+      'dotMeta'
     ]),
     ...mapGetters(['isAuthenticated']),
     draft () {
@@ -351,11 +357,12 @@ export default {
             data: dotfiles.metadata.body,
             name: dotfiles.title,
             visibility: dotfiles.metadata.visibility,
+            ghUser: dotfiles.metadata.ghUser,
             initialLoad: true
           })
           this.loaded = true
           this.isSavedInCloud = true
-        })
+        }) // error handled inside fetchDbData
       } else {
         // not a name --> check if query contains dot
         let url = this.$route.query.url
@@ -413,11 +420,6 @@ export default {
       //   this.loaded = true
       // }
     },
-    openSave (saveToCloud) {
-      this.setFilename()
-      this.showSave = true
-      this.saveToCloud = saveToCloud
-    },
     setFilename () {
       this.saveName = this.filename
       // console.log('set filename', this.filename, this.saveName)
@@ -434,7 +436,10 @@ export default {
       )
     },
     toggleVisibility () {
-      const newVisibility = this.visibility === 'private' ? 'public' : 'private'
+      if (this.$store.state.auth.user.username !== this.dotMeta.ghUser) {
+        return // not owner
+      }
+      const newVisibility = this.dotMeta.visibility === 'private' ? 'public' : 'private'
       this.changeVisibility({params: this.$route.params, newVisibility})
     },
     // render error updating
@@ -459,7 +464,7 @@ export default {
         .get(`/.netlify/functions/data/${user}/${slug}`)
         .then(response => response.data)
         .catch(({response}) => {
-          this.errorMessage = response.data.error.message
+          this.errorMessage = (response.data.error && response.data.error.message) || response.statusText
           this.showError = true
           this.loaded = true
         })
@@ -487,7 +492,7 @@ export default {
       if (this.saveToCloud) {
         // call aws --> aws checks if name is already saved & updates data (revisions handled by cosmic)
         // console.log('save to cloud', this.$route.params)
-        axios
+        return axios
           .post('/.netlify/functions/data/', {
             params: this.$route.params,
             title: name,
@@ -500,6 +505,10 @@ export default {
             if (redirect) {
               this.$router.push(redirect)
             }
+            return {
+              status: true,
+              message: 'saved'
+            }
           })
           .catch(err => {
             this.errorMessage = err.message
@@ -511,6 +520,23 @@ export default {
 
       this.showSave = false
       this.saveToCloud = false
+    },
+    openSave (saveToCloud, autoSave = true) {
+      this.setFilename()
+      this.saveToCloud = saveToCloud
+
+      if (this.$route.params.slug && this.$route.params.user && autoSave) {
+        // console.log('already saved', this.saveName) // directly save
+        this.$set(this, 'saveInProgess', true)
+        this.performSave(this.saveName)
+        .then(result => {
+          this.$set(this, 'saveInProgess', false)
+          this.$set(this, 'editorStatusText', result.message)
+          setTimeout(() => this.$set(this, 'editorStatusText', ''), 2000) // auto-clear after 2 seconds
+        })
+      } else {
+        this.showSave = true
+      }
     },
     cancelSave () {
       this.showSave = false

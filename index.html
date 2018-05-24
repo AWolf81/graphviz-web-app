@@ -49,7 +49,7 @@
     var disableStr = 'ga-disable-' + gaProperty;
     if (document.cookie.indexOf(disableStr + '=true') > -1) {
       window[disableStr] = true;
-      console.log('disbaled?', window[disableStr], disableStr);
+      // console.log('disbaled?', window[disableStr], disableStr);
     }
 
     // Opt-out function
@@ -57,7 +57,16 @@
       document.cookie = disableStr + '=true; expires=Thu, 31 Dec 2099 23:59:59 UTC; path=/';
       window[disableStr] = true;
 
-      console.log('disabled', window[disableStr]);
+      // console.log('disabled', window[disableStr]);
+    }
+
+    function gaEnableTracking() {
+      if (document.cookie.indexOf(disableStr + '=true') > -1) {
+        // cookie exists --> delete cookie
+        document.cookie = disableStr + '=false; expires=Thu, 01 Jan 1970 00:00:01 GMT; path=/';  
+        window[disableStr] = false
+        // console.log('remove cookie');
+      }
     }
   </script>
   </body>

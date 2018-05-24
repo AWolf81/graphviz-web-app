@@ -1,32 +1,33 @@
 <template lang="html">
   <div>
-      <div class="btn-group" :class="{open: showExportSettings}"
+      <!-- <div class="btn-group" :class="{open: showExportSettings}"
         v-on-clickaway="hideDropdown">
         <button class="btn btn-default navbar-btn" type="button" @click="showExportSettings = !showExportSettings">
           <span class="glyphicon glyphicon-wrench" aria-hidden="true"></span>
           <span class="hidden-xs">Settings <span class="caret"></span></span></button>
-        </button>
-        <div class="dropdown-menu"  v-if="showExportSettings" :aria-expanded="showExportSettings">
+        </button> -->
+        <!-- disable png export for now bc. scaling issue -->
+        
+          <!-- <div class="dropdown-menu"  v-if="showExportSettings" :aria-expanded="showExportSettings">
           <div class="form-group">
               <label label-for="scale-input">Scale <small>(only raster image)</small></label>
               <input id="scale-input" v-model.number="scale" @keyup="scaleChanged" @change="scaleChanged" type="number" min="0" step="0.5"/>
           </div>
           <small>Exported image size (w x h):<br/>{{ displaySize() }}</small>
 
-        </div>
+        </div> -->
       <!-- </div>
       <div class="btn-group save-buttons"> -->
-        <button title="save as png" class="btn btn-default navbar-btn" @click="savePNG" aria-label="Left Align">
+        <!-- disable PNG saving - re-add later -->
+        <!-- <button title="save as png" class="btn btn-default navbar-btn" @click="savePNG" aria-label="Left Align">
           <span class="glyphicon glyphicon-floppy-disk" aria-hidden="true"></span>
-            <!-- <span class="label label-default">(png)</span> -->
             <span class="save-button-label">(PNG)</span>
-          </button>
+          </button> -->
           <button title="save as svg" class="btn btn-default navbar-btn" @click="saveSVG"aria-label="Left Align">
             <span class="glyphicon glyphicon-floppy-disk" aria-hidden="true"></span>
-            <!-- <span class="label label-default">(svg)</span> -->
             <span class="save-button-label">(SVG)</span>
           </button>
-      </div>
+      <!-- </div> -->
       <div id="exportSVG" class="">
       </div>
     </div>
@@ -64,7 +65,7 @@
       },
       methods: {
         createExportSvg () {
-          let graph = document.querySelector('.graph').cloneNode(true) // svg
+          let graph = document.querySelector('#graph0').cloneNode(true) // svg
           let svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
           svg.appendChild(graph)
 
@@ -74,13 +75,26 @@
           } else {
             exportArea.replaceWith(svg)
           }
-          let graphBox = graph.getBoundingClientRect() // .getClientRects()[0] // getBBox()
-          // console.log('graphbox', graphBox)
-          svg.setAttribute('width', this.scale * graphBox.width)
-          svg.setAttribute('height', this.scale * graphBox.height)
-          svg.setAttribute('viewBox', `0 0 ${this.scale * graphBox.width} ${this.scale * graphBox.height}`)
-          svg.setAttribute('transform', `scale(${this.scale})`)
+          // let orgSvg = document.querySelector('svg')
+          // let graphBox = graph.getBoundingClientRect() // .getClientRects()[0] // getBBox()
+          let graphBox = graph.getBBox() // .getClientRects()[0] // getBBox()
+
+          svg.setAttribute('width', graphBox.width)
+          svg.setAttribute('height', graphBox.height)
+          // graph.setAttribute('width', this.scale * graphBox.width)
+          // graph.setAttribute('height', this.scale * graphBox.height)
+          // // svg.setAttribute('viewBox', `0 0 ${this.scale * graphBox.width} ${this.scale * graphBox.height}`)
+          // svg.setAttribute('transform', `scale(${this.scale}, ${this.scale})`)
+          // let graphBox = graph.getBoundingClientRect() // .getClientRects()[0] // getBBox()
+          // console.log(orgSvg.width, orgSvg.height)
+          console.log('graphbox', graphBox)
+          // svg.setAttribute('width', graphBox.width)
+          // svg.setAttribute('height', graphBox.height)
+          // svg.setAttribute('viewBox', `0 0 ${graphBox.width} ${graphBox.height}`)
+          // svg.setAttribute('viewBox', `0 0 ${svg.width} ${svg.height}`)
+          // graph.setAttribute('transform', `scale(${this.scale})`)
           // console.log('svg size', graphBox.width, graphBox.height, svg.getBoundingClientRect())
+          // return graphBox // svg.getClientRects()[0] // getBoundingClientRect() // getClientRects()[0]
           return graphBox // svg.getClientRects()[0] // getBoundingClientRect() // getClientRects()[0]
         },
         hideDropdown () {
@@ -121,10 +135,11 @@
           // console.log(this.name)
           this.save((svg) =>
             saveSvgAsPng(svg, this.name + '.png'))
+            // saveSvgAsPng(svg, this.name + '.png'))
         },
         saveSVG () {
           this.save((svg) =>
-            saveSvg(document.querySelector('svg'), this.name + '.svg'))
+            saveSvg(svg, this.name + '.svg'))
         }
       }
     }
@@ -163,10 +178,10 @@
       /* hidden export area (used for size calculation & exporting)*/
       // display: none;
       position: absolute;
-      opacity: 0;
+      // opacity: 0;
       top: 0;
       left: 0;
-      z-index: -1; /* behind render area */
+      // z-index: -1; /* behind render area */
       /* svg background white / not transparent --> exort svg is invisble */
     }
 /* Portrait and Landscape */

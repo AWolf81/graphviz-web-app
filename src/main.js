@@ -10,7 +10,8 @@ import store from './store'
 import './ie-fix.js'
 
 // load spinner css
-require('../node_modules/spinkit/css/spinners/8-circle.css')
+// require('../node_modules/spinkit/css/spinners/8-circle.css')
+require('../node_modules/spinkit/css/spinners/7-three-bounce.css')
 require('./assets/main.css') // load styling before Vue bootstrapped
 
 Vue.config.productionTip = false

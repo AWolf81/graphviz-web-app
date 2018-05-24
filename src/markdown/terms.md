@@ -5,7 +5,7 @@ Last updated: May 10, 2018
 
 Please read these Terms of Service ("Terms", "Terms of Service") carefully
 before using the https://drawviz.com website (the "Service") operated by
-DrawViz ("us", "we", or "our").
+AWolf81 ("us", "we", or "our").
 
 Your access to and use of the Service is conditioned on your acceptance of and
 compliance with these Terms. These Terms apply to all visitors, users and

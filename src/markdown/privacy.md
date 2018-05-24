@@ -6,7 +6,7 @@ This privacy notice will describe how the web app hosted at **www.drawviz.com** 
 ## Identity of the controllers
 - [AWolf81](https://www.github.com/awolf81) is maintaining this app and responsible to ensure your data privacy.
 - [Cosmic JS](https://cosmicjs.com) for data storage
-- [Google Analytics](https://analytics.google.com) for user tracking (can be disabled)
+- [Google Analytics](https://analytics.google.com) for user tracking. Google tracking can be disabled by clicking <a href="javascript:gaDisableTracking(); alert('Tracking disabled.');">here.</a> If you like to enable tracking again click <a href="javascript:gaEnableTracking(); alert('Tracking enabled.');">Enable tracking.</a>
 
 ## Stored data
 There are two options to store your data:

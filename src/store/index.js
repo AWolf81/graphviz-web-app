@@ -25,11 +25,18 @@ export default new Vuex.Store({
       ## b to c and back to a
       b -> c -> a;
     }`,
-    visibility: undefined, // private or public for cloud stored dots
+    dotMeta: {
+      ghUser: undefined,
+      visibility: undefined // private or public for cloud stored dots
+    },
     graphToDelete: undefined,
     editorTheme: Vue.ls.get('editorTheme') || DEFAULT_CODEMIRROR_THEME,
     showDelete: false,
-    storedGraphs: Vue.ls.get('storedGraphs') || []
+    storedGraphs: Vue.ls.get('storedGraphs') || [],
+    actionResponse: {
+      status: undefined, // true if success, false on failed
+      message: undefined // error message
+    }
   },
   actions: {
     async triggerRemoveGraph ({commit, state}) {
@@ -46,20 +53,32 @@ export default new Vuex.Store({
       }
     },
     changeVisibility ({commit, state}, {params, newVisibility}) {
-      console.log('change vis', state.visibility, newVisibility)
-      if (state.visibility === newVisibility) {
+      // console.log('change vis', state.visibility, newVisibility)
+      const oldVisibility = `${state.visibility}`
+      if (state.dotMeta.visibility === newVisibility) {
         return // already set
       }
       // @todo --> check if other user wants to share public graph (no setting visibility required)
+      commit('setVisibility', newVisibility) // set right away --> faster display
+      let status = {
+        dotfile: params
+      }
+
       return axios.post('/.netlify/functions/data/', {
         params: params,
         visibility: newVisibility
       }).then((res) => {
         console.log('changed vis', res)
-        commit('setVisibility', newVisibility)
+        status = {...status, status: true, message: 'Successfully changed status'}
+        commit('setActionResponse', status)
+        return status
       })
       .catch(error => {
-        console.log(error)
+        status = {...status, status: false, message: error.message}
+        // console.log(error) // todo check if we need to undo commit here
+        commit('setVisibility', oldVisibility) // restore previous visibility --> as it is not applied at server
+        commit('setActionResponse', status)
+        return Promise.reject(status)
       })
     }
   },
@@ -80,11 +99,18 @@ export default new Vuex.Store({
       state.showDelete = true
     },
     setVisibility (state, newVisibility) {
-      state.visibility = newVisibility
+      Vue.set(state.dotMeta, 'visibility', newVisibility)
     },
-    updateGraphData (state, {data, name, initialLoad, visibility}) {
+    setActionResponse (state, {status, message}) {
+      Vue.set(state.actionResponse, 'status', status)
+      Vue.set(state.actionResponse, 'message', message)
+    },
+    updateGraphData (state, {data, name, initialLoad, visibility, ghUser}) {
       state.dotData = data // used to update data from editor
-      state.visibility = visibility
+      Vue.set(state, 'dotMeta', {
+        visibility,
+        ghUser
+      })
 
       if (data !== '' && !initialLoad) {
         // avoid clearing of draft & avoid overwriting draft on cloud load
