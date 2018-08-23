@@ -36,6 +36,6 @@ The encryption/decryption is handled by an AWS Lambda function so the secrect ke
 ### Data transfer
 Every request is performed with a secure https connection. Encryption details TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256, 128-bin key, TLS.
 
-## Glossar
+## Glossary
 - full-access: Read & write access.
 - dot: Text that will be rendered with Graphviz and follows the dot syntax.
