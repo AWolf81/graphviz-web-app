@@ -36,7 +36,7 @@ yarn install
 yarn dev
 
 # build for production with minification
-npm build
+yarn build
 
 # build for production and view the bundle analyzer report
 yarn build --report
