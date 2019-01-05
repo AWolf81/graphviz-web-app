@@ -1,6 +1,5 @@
 <template>
   <div id="app">
-    <!-- <img src="./assets/logo.png"> -->
     <router-view :key="$route.path"></router-view>
   </div>
 </template>

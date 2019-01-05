@@ -187,6 +187,7 @@ import "@/helpers/loadCodemirrorThemes.js";
 import pageBreakMixin from "@/mixins/PageBreak";
 // import 'codemirror/addon/selection/mark-selection'
 import "codemirror/lib/codemirror.css";
+import "codemirror/mode/shell/shell";
 
 Vue.directive("focus", {
   // When the bound element is inserted into the DOM...
@@ -219,9 +220,11 @@ export default {
       // localDotData: '',
       editorOption: {
         tabSize: 2,
-        gutters: ["CodeMirror-linenumbers", "markers"],
-        viewportMargin: Infinity,
-        lineWrapping: false
+        lineNumbers: true,
+        mode: "shell",
+        gutters: ["CodeMirror-linenumbers", "markers"]
+        // viewportMargin: Infinity,
+        // lineWrapping: false
         // styleSelectedText: true
         // scrollbarStyle: 'null'
       },
