@@ -1,23 +1,23 @@
-import Vue from 'vue'
-import Router from 'vue-router'
+import Vue from "vue";
+import Router from "vue-router";
 // import Hello from '@/components/Hello'
-import Graphviz from '@/components/GraphViz'
-import AppLayout from '@/components/layout/AppLayout'
-import About from '@/pages/About'
+import Graphviz from "@/components/GraphViz";
+import AppLayout from "@/components/layout/AppLayout";
+import About from "@/pages/About";
 
-Vue.use(Router)
+Vue.use(Router);
 
 export default new Router({
-  mode: 'history',
+  mode: "history",
   base: __dirname,
   routes: [
     {
-      path: '',
+      path: "",
       component: AppLayout,
       children: [
         {
-          path: '/:slug?',
-          name: 'Home',
+          path: "/:slug?",
+          name: "Home",
           component: Graphviz,
           meta: { reuse: false }
           // alias: '/example/:index'
@@ -25,18 +25,18 @@ export default new Router({
           //   component: Hello
         },
         {
-          path: '/example/:index?',
-          name: 'Example',
+          path: "/example/:index?",
+          name: "Example",
           component: Graphviz,
           meta: { reuse: false }
         },
         {
-          path: '/i/about',
-          name: 'About',
+          path: "/i/about",
+          name: "About",
           component: About,
           meta: { reuse: false }
         }
       ]
     }
   ]
-})
+});

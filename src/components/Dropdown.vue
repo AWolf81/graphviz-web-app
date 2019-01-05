@@ -1,41 +1,44 @@
 <template lang="html">
-  <component :is="tag" @click.prevent="toggle"
-    :class="{dropdown: dir == 'down', dropup: dir === 'up', open: visible}" v-on-clickaway="hideDropdown">
-      <component
-        :is="triggerTag"
-        href="#"
-       :aria-expanded="visible"><slot name="trigger"></slot>
-        <!-- class="dropdown-toggle" -->
-      </component>
+  <component
+    :is="tag"
+    @click.prevent="toggle"
+    :class="{ dropdown: dir == 'down', dropup: dir === 'up', open: visible }"
+    v-on-clickaway="hideDropdown"
+  >
+    <component :is="triggerTag" href="#" :aria-expanded="visible"
+      ><slot name="trigger"></slot>
+      <!-- class="dropdown-toggle" -->
+    </component>
     <!-- <slot name="trigger" @click="toggle"></slot> -->
     <transition
       :duration="duration"
       v-on:enter="showDropdown"
       v-on:after-leave="hideDropdown"
       :enter-active-class="applyClass(inClass)"
-      :leave-active-class="applyClass(outClass)">
+      :leave-active-class="applyClass(outClass)"
+    >
       <slot v-if="visible"></slot>
     </transition>
   </component>
 </template>
 
 <script>
-import {mixin as clickaway} from 'vue-clickaway'
+import { mixin as clickaway } from "vue-clickaway";
 export default {
-  data () {
+  data() {
     return {
       visible: false
-    }
+    };
   },
   mixins: [clickaway],
   props: {
     dir: {
       type: String,
-      default: 'down'
+      default: "down"
     },
     animationClass: {
       type: String,
-      default: 'animated'
+      default: "animated"
     },
     duration: {
       type: [Number, Object],
@@ -43,42 +46,40 @@ export default {
     },
     inClass: {
       type: String,
-      default: 'zoomIn'
+      default: "zoomIn"
     },
     outClass: {
       type: String,
-      default: 'zoomOut'
+      default: "zoomOut"
     },
     tag: {
       type: String,
-      default: 'li'
+      default: "li"
     },
     triggerTag: {
       type: String,
-      default: 'a'
+      default: "a"
     }
   },
   methods: {
-    applyClass (className) {
-      // console.log('apply', `${this.animationClass} ${className}`)
-      return `${this.animationClass} ${className}`
+    applyClass(className) {
+      return `${this.animationClass} ${className}`;
     },
-    toggle () {
-      console.log('toggle dropdown')
-      this.visible = !this.visible
+    toggle() {
+      this.visible = !this.visible;
     },
-    showDropdown () {
-      this.visible = true
-      this.$emit('show')
+    showDropdown() {
+      this.visible = true;
+      this.$emit("show");
     },
-    hideDropdown () {
-      this.visible = false
-      this.$emit('hide')
+    hideDropdown() {
+      this.visible = false;
+      this.$emit("hide");
     }
   }
-}
+};
 </script>
 
 <style lang="css">
-  @import "~animate.css/animate.css";
+@import "~animate.css/animate.css";
 </style>

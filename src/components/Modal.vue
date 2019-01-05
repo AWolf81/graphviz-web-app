@@ -3,18 +3,11 @@
     <div class="modal-mask" @click="close" v-show="displayModal">
       <div class="modal-wrapper">
         <div class="modal-container" @click.stop>
-
           <div class="modal-header">
-            <slot name="header">
-              default header
-            </slot>
+            <slot name="header"> default header </slot>
           </div>
 
-          <div class="modal-body">
-            <slot name="body">
-              default body
-            </slot>
-          </div>
+          <div class="modal-body"><slot name="body"> default body </slot></div>
 
           <div class="modal-footer">
             <slot name="footer">
@@ -34,33 +27,33 @@
 
 <script>
 export default {
-  props: ['show'],
-  data () {
-    console.log('modal init', this.show)
+  props: ["show"],
+  data() {
     return {
       displayModal: this.show
-    }
+    };
   },
-  mounted () {
-    this.$emit('ready')
-    document.addEventListener('keydown', (e) => {
+  mounted() {
+    this.$emit("ready");
+    document.addEventListener("keydown", e => {
       if (this.show && e.keyCode === 27) {
-        this.close()
+        this.close();
       }
-    })
+    });
   },
   watch: {
-    show () {
-      this.displayModal = this.show
+    show() {
+      this.displayModal = this.show;
     }
   },
   methods: {
-    close () { // backdrop click
-      this.displayModal = false
-      this.$emit('cancel')
+    close() {
+      // backdrop click
+      this.displayModal = false;
+      this.$emit("cancel");
     }
   }
-}
+};
 </script>
 
 <style lang="css">
@@ -71,9 +64,9 @@ export default {
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, .5);
+  background-color: rgba(0, 0, 0, 0.5);
   display: table;
-  transition: opacity .3s ease;
+  transition: opacity 0.3s ease;
 }
 
 .modal-wrapper {
@@ -87,8 +80,8 @@ export default {
   padding: 20px 30px;
   background-color: #fff;
   border-radius: 2px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, .33);
-  transition: all .3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.33);
+  transition: all 0.3s ease;
   font-family: Helvetica, Arial, sans-serif;
 }
 

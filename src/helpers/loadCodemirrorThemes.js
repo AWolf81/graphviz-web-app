@@ -1,6 +1,7 @@
-function requireAll (r) {
-  r.keys().forEach(r)
+function requireAll(r) {
+  r.keys().forEach(r);
 }
 
 requireAll(
-  require.context('../../node_modules/codemirror/theme', false, /\.css$/))
+  require.context("../../node_modules/codemirror/theme", false, /\.css$/)
+);

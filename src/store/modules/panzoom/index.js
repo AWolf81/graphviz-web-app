@@ -1,33 +1,29 @@
-import svgPanZoom from 'svg-pan-zoom'
-import store from '@/store'
+import svgPanZoom from "svg-pan-zoom";
+import store from "@/store";
 // import {saveSvgAsPng, saveSvg} from 'save-svg-as-png'
 
-import eventsHandler from './EventsHandler'
+import eventsHandler from "./EventsHandler";
 
-function onResize () {
-  console.log('resized')
-  let panZoom = store.state.panZoom.instance
+function onResize() {
+  let panZoom = store.state.panZoom.instance;
   setTimeout(() => {
     // delayed for maximize event
     // panZoom.fit()
     // panZoom.center()
-    panZoom.reset()
-    panZoom.resize()
-    console.log('updated panZoom')
+    panZoom.reset();
+    panZoom.resize();
     // store.commit('updateSVGSize', document.querySelector('svg').getBBox())
-  }, 500)
+  }, 500);
 }
 
-function onPan (newPan) {
-  console.log(this, newPan)
-  store.commit('updatePan', newPan)
+function onPan(newPan) {
+  store.commit("updatePan", newPan);
   // this.state.panPos = newPan
 }
 
-function onZoom (newZoom) {
-  console.log(this, newZoom)
+function onZoom(newZoom) {
   // this.zoomPos = newZoom77
-  store.commit('updateZoom', newZoom)
+  store.commit("updateZoom", newZoom);
   // this.state.panZoom = newZoom
 }
 
@@ -67,8 +63,8 @@ export default {
     size: undefined
   },
   actions: {
-    triggerPanzommResize () {
-      onResize()
+    triggerPanzommResize() {
+      onResize();
     }
   },
   // actions: {
@@ -87,13 +83,13 @@ export default {
   //   }
   // },
   mutations: {
-    createPanZoom (state) {
+    createPanZoom(state) {
       // svg must be rendered before!!!
       // re-created after each render
-      let svgElement = document.querySelector('svg')
-      if (!svgElement) return
+      let svgElement = document.querySelector("svg");
+      if (!svgElement) return;
 
-      let panZoom = state.instance = svgPanZoom(svgElement, {
+      let panZoom = (state.instance = svgPanZoom(svgElement, {
         // viewportSelector: '.render-wrapper'
         zoomEnabled: true,
         controlIconsEnabled: true,
@@ -103,33 +99,32 @@ export default {
         onZoom: onZoom,
         onPan: onPan,
         customEventsHandler: eventsHandler
-      })
+      }));
       //
-      panZoom.resize() // update SVG cached size and controls positions
+      panZoom.resize(); // update SVG cached size and controls positions
       // panZoom.fit()
       // panZoom.center()
       // register resize handler
-      window.onresize = onResize
+      window.onresize = onResize;
     },
-    updateSVGSize (state, size) {
-      state.size = size
-      state.instance.resize()
+    updateSVGSize(state, size) {
+      state.size = size;
+      state.instance.resize();
     },
-    disableControls (state) {
-      let panZoom = state.instance
-      console.log('disableControls', panZoom)
-      panZoom.resize()
-      panZoom.disableControlIcons()
+    disableControls(state) {
+      let panZoom = state.instance;
+      panZoom.resize();
+      panZoom.disableControlIcons();
     },
-    enableControls (state) {
-      let panZoom = state.instance
-      panZoom.enableControlIcons()
+    enableControls(state) {
+      let panZoom = state.instance;
+      panZoom.enableControlIcons();
     },
-    updatePan (state, newPan) {
-      state.panPos = newPan
+    updatePan(state, newPan) {
+      state.panPos = newPan;
     },
-    updateZoom (state, newZoom) {
-      state.zoomPos = newZoom
+    updateZoom(state, newZoom) {
+      state.zoomPos = newZoom;
     }
   }
-}
+};

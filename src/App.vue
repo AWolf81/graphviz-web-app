@@ -7,24 +7,26 @@
 
 <script>
 export default {
-  name: 'app'
-}
+  name: "app"
+};
 </script>
 
 <style lang="scss">
-$icon-font-path: '~bootstrap-sass/assets/fonts/bootstrap/';
-@import '~bootstrap-sass/assets/stylesheets/_bootstrap.scss';
+$icon-font-path: "~bootstrap-sass/assets/fonts/bootstrap/";
+@import "~bootstrap-sass/assets/stylesheets/_bootstrap.scss";
 @import "~nanoscroller/bin/css/nanoscroller.css";
 
 $spacing: 8px; // spacing between render and definition
 
-body { padding-top: 60px; }
+body {
+  padding-top: 60px;
+}
 
 textarea {
   width: 100%;
   min-height: 200px;
   padding-bottom: 10px;
-  font-family: "Lucida Console", Monaco, monospace
+  font-family: "Lucida Console", Monaco, monospace;
 }
 
 footer {
@@ -50,8 +52,10 @@ footer {
   /*background: #bba; */
   height: 300px;
 }
-.nano > .nano-content { padding: 10px; }
-.nano > .nano-pane   {
+.nano > .nano-content {
+  padding: 10px;
+}
+.nano > .nano-pane {
   background: #e1f5fe;
   width: 5px;
 }
@@ -69,8 +73,13 @@ footer {
 }*/
 
 /* IE view-port fix */
-@-ms-viewport       { width: device-width; }
-@-o-viewport        { width: device-width; }
-@viewport           { width: device-width; }
-
+@-ms-viewport {
+  width: device-width;
+}
+@-o-viewport {
+  width: device-width;
+}
+@viewport {
+  width: device-width;
+}
 </style>

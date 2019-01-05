@@ -1,20 +1,18 @@
-export const DEFAULT_CODEMIRROR_THEME = 'default'
-export const DEFAULT_EXPORT_NAME = 'diagram'
+export const DEFAULT_CODEMIRROR_THEME = "default";
+export const DEFAULT_EXPORT_NAME = "diagram";
 export const examples = [
   {
     id: 0,
-    caption: 'Simple',
-    data:
-`digraph G {
+    caption: "Simple",
+    data: `digraph G {
   ## Comment with double hash char
   Hello->World
 }`
   },
   {
     id: 1,
-    caption: 'State machine',
-    data:
-`digraph finite_state_machine {
+    caption: "State machine",
+    data: `digraph finite_state_machine {
   rankdir=LR;
   size="8,5"
   node [shape = doublecircle]; LR_0 LR_3 LR_4 LR_8;
@@ -37,23 +35,24 @@ export const examples = [
   },
   {
     id: 2,
-    caption: 'Crazy',
-    url: 'https://graphviz.gitlab.io/_pages/Gallery/directed/crazy.gv.txt'
-  }, {
+    caption: "Crazy",
+    url: "https://graphviz.gitlab.io/_pages/Gallery/directed/crazy.gv.txt"
+  },
+  {
     id: 3,
-    caption: 'PSG',
-    url: 'https://graphviz.gitlab.io/_pages/Gallery/directed/psg.gv.txt'
+    caption: "PSG",
+    url: "https://graphviz.gitlab.io/_pages/Gallery/directed/psg.gv.txt"
   },
   {
     id: 4,
-    caption: 'Traffic lights', // loaded via ajax --> huge definition
-    url: 'https://graphviz.gitlab.io/_pages/Gallery/directed/traffic_lights.gv.txt'
+    caption: "Traffic lights", // loaded via ajax --> huge definition
+    url:
+      "https://graphviz.gitlab.io/_pages/Gallery/directed/traffic_lights.gv.txt"
   },
   {
     id: 5,
-    caption: 'Grouped',
-    data:
-`digraph {
+    caption: "Grouped",
+    data: `digraph {
   ## example grouped (a goes to b & d, b&d result in c)
   a-> {
     b,
@@ -61,4 +60,4 @@ export const examples = [
   } -> c
 }`
   }
-]
+];

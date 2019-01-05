@@ -7,6 +7,7 @@ Live demo is online here http://drawviz.com
 To learn more about graphviz please have a look at http://www.graphviz.org/.
 
 ## Todos
+
 - [x] Add about page - showing current version + some resource links
 - [x] Fix exporting with pan & zoom (pan & zoom disabled at the moment)
 - [x] Improve size calculation at Export settings (sometimes wrong size)
@@ -18,6 +19,7 @@ To learn more about graphviz please have a look at http://www.graphviz.org/.
 - [x] Add drafting feature - every new page will be automatically saved as draft + autosave (could be improved by reducing save freq. - at the moment every change will be save)
 
 ## Features
+
 - Render graph with two-way binding (no render click required)
 - Example graphs
 - Save dot text in localstorage
@@ -28,27 +30,28 @@ To learn more about graphviz please have a look at http://www.graphviz.org/.
 
 ## Build Setup
 
-``` bash
+```bash
 # install dependencies
-npm install
+yarn install
 
 # serve with hot reload at localhost:8080
-npm run dev
+yarn serve
 
 # build for production with minification
-npm run build
+yarn build
 
 # build for production and view the bundle analyzer report
-npm run build --report
+yarn build --report
 
-# run unit tests
-npm run unit
+# Lints and fixes files
 
-# run e2e tests
-npm run e2e
+yarn lint
 
-# run all tests
-npm test
+# Run your unit tests
+
+yarn run test:unit
 ```
 
-For detailed explanation on how things work, checkout the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).
+### Customize configuration
+
+See [Configuration Reference](https://cli.vuejs.org/config/).
