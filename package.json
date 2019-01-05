@@ -9,7 +9,7 @@
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
     "test:unit": "vue-cli-service test:unit",
-    "pre-deploy": "npm run build",
+    "predeploy": "yarn build",
     "deploy": "surge --domain https://drawviz.surge.sh"
   },
   "dependencies": {
