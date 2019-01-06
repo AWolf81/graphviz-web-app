@@ -1,60 +1,62 @@
-import Vue from 'vue'
-import Router from 'vue-router'
+import Vue from "vue";
+import Router from "vue-router";
 // import Hello from '@/components/Hello'
-import Graphviz from '@/components/GraphViz'
-import Dashboard from '@/components/Dashboard'
-import AppLayout from '@/components/layout/AppLayout'
-import About from '@/pages/About'
+import Graphviz from "@/components/GraphViz";
+import Dashboard from "@/components/Dashboard";
+import AppLayout from "@/components/layout/AppLayout";
+import About from "@/pages/About";
 
-Vue.use(Router)
+Vue.use(Router);
 
 export default new Router({
-  mode: 'history',
+  mode: "history",
   base: __dirname,
   routes: [
     {
-      path: '',
+      path: "",
       component: AppLayout,
       children: [
         {
-          path: '/dashboard',
-          name: 'Dashboard',
+          path: "/dashboard",
+          name: "Dashboard",
           component: Dashboard
         },
         {
-          path: '/i/about',
-          name: 'About',
+          path: "/i/about",
+          name: "About",
           component: About,
           meta: { reuse: false }
         },
         {
-          path: '/i/privacy',
-          name: 'Privacy',
-          component: require('../markdown/privacy.md')
+          path: "/i/privacy",
+          name: "Privacy",
+          component: require("../markdown/privacy.md")
         },
         {
-          path: '/i/terms',
-          name: 'Terms',
-          component: require('../markdown/terms.md')
+          path: "/i/terms",
+          name: "Terms",
+          component: require("../markdown/terms.md")
         },
         {
-          path: '/example/:index?',
-          name: 'Example',
+          path: "/example/:index?",
+          name: "Example",
           component: Graphviz,
           meta: { reuse: false }
         },
-        { // route for localStorage dots
-          path: ':user/:slug',
-          name: 'cloud',
+        {
+          // route for localStorage dots
+          path: ":user/:slug",
+          name: "cloud",
           component: Graphviz,
           meta: { reuse: false }
           // alias: '/example/:index'
           // name: 'Hello',
           //   component: Hello
         },
-        { // route for localStorage dots or new dot
-          path: '/:slug?',
-          name: 'Home',
+        {
+          // route for localStorage dots or new dot
+          path: "/:slug?",
+          name: "Home",
           component: Graphviz,
           meta: { reuse: false }
           // alias: '/example/:index'
@@ -64,4 +66,4 @@ export default new Router({
       ]
     }
   ]
-})
+});

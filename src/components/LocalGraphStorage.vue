@@ -5,7 +5,7 @@
       <div class="nano">
         <div class="nano-content">
           <!-- <div class="dropdown-menu"> -->
-            <div v-for="graph in graphs">
+            <div :key="index" v-for="(graph, index) in graphs">
               <div class="media load-item">
                 <h4 class="media-heading">{{graph.name}}</h4>
                 <button class="btn btn-xs" @click="show(graph)">show</button>
@@ -13,6 +13,7 @@
                 <div class="media-footer">created at {{formatDate(graph.createdAt)}}</div>
               </div>
             </div>
+          </div>
           <!-- </div> -->
         </div>
       </div>
@@ -30,38 +31,40 @@ import 'nanoscroller'
 
 export default {
   components: {
-    dropdown,
-    modal
+    dropdown
+    // modal
   },
-  data () {
+  data() {
     return {
       graphToDelete: undefined
-    }
+    };
   },
-  props: ['graphs'],
+  props: ["graphs"],
   methods: {
     formatDate,
     show (graph) {
       if (graph.slug) {
-        this.$router.push({name: 'Home',
+        this.$router.push({
+          name: "Home",
           params: {
             slug: graph.slug
-          }})
+          }
+        });
         // new stored data will be with slug
-        return
+        return;
       }
 
       // below is kept to be backwards compatible
       if (this.$route.name !== 'Home') {
         // ensure that we're having the correct view
-        this.$router.push('/')
+        this.$router.push("/");
       }
       //
-      this.$store.commit('updateGraphData', graph)
-      this.showLoadDropdown = false
+      this.$store.commit("updateGraphData", graph);
+      this.showLoadDropdown = false;
     },
-    showDeleteConfirm (graph) {
-      this.$store.commit('showDeleteConfirm', graph)
+    showDeleteConfirm(graph) {
+      this.$store.commit("showDeleteConfirm", graph);
     },
     triggerNanoscroller () {
       setTimeout(() =>
@@ -70,20 +73,20 @@ export default {
     }
   },
   mixins: [clickaway]
-}
+};
 </script>
 
 <style lang="css">
-  .dropdown-menu {
-    width: 20em;
-    padding: 0.5em;
-    max-height: 80vh;
-    overflow-y: auto;
-  }
+.dropdown-menu {
+  width: 20em;
+  padding: 0.5em;
+  max-height: 80vh;
+  overflow-y: auto;
+}
 
-  .load-item {
-    padding-bottom: 0.5em;
-    border-bottom: 1px solid #cccccc;
-    margin-bottom: 0.2em;
-  }
+.load-item {
+  padding-bottom: 0.5em;
+  border-bottom: 1px solid #cccccc;
+  margin-bottom: 0.2em;
+}
 </style>

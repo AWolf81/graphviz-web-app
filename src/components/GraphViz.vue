@@ -60,7 +60,7 @@
                 </nav>
                 <div v-if="renderErrorMessage!=''" class="render-error"><small>{{renderErrorMessage}}</small>
                 </div>
-                <codemirror :value="localDotData" @change="updateDot" :options="editorOption" @ready="onEditorReady"></codemirror>
+                <codemirror :value="localDotData" @input="updateDot" :options="editorOption" @ready="onEditorReady"></codemirror>
                 <theme-select></theme-select>
               <!-- </div> -->
           </div>
@@ -203,6 +203,8 @@ export default {
       // localDotData: '',
       editorOption: {
         tabSize: 2,
+        lineNumbers: true,
+        //mode: "shell",
         gutters: ['CodeMirror-linenumbers', 'markers'],
         viewportMargin: Infinity,
         lineWrapping: false

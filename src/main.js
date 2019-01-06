@@ -1,29 +1,29 @@
 // The Vue build version to load with the `import` command
 // (runtime-only or standalone) has been set in webpack.base.conf with an alias.
-import Vue from 'vue'
-import App from './App'
-import router from './router'
-import VueLs from 'vue-ls'
-import SocialSharing from 'vue-social-sharing'
+import Vue from "vue";
+import App from "./App";
+import router from "./router";
+import VueLs from "vue-ls";
+import SocialSharing from "vue-social-sharing";
 
-import store from './store'
-import './ie-fix.js'
+import store from "./store";
+import "./ie-fix.js";
 
 // load spinner css
 // require('../node_modules/spinkit/css/spinners/8-circle.css')
-require('../node_modules/spinkit/css/spinners/7-three-bounce.css')
-require('./assets/main.css') // load styling before Vue bootstrapped
+require("../node_modules/spinkit/css/spinners/7-three-bounce.css");
+require("./assets/main.css"); // load styling before Vue bootstrapped
 
-Vue.config.productionTip = false
+Vue.config.productionTip = false;
 
-Vue.use(VueLs)
-Vue.use(SocialSharing)
+Vue.use(VueLs);
+Vue.use(SocialSharing);
 
 /* eslint-disable no-new */
 new Vue({
-  el: '#app',
+  el: "#app",
   store,
   router,
-  template: '<App/>',
+  template: "<App/>",
   components: { App }
-})
+});

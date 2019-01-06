@@ -13,16 +13,15 @@
 </template>
 
 <script>
-import navbar from '@/components/includes/Navbar'
-import appFooter from '@/components/includes/Footer'
+import navbar from "@/components/includes/Navbar";
+import appFooter from "@/components/includes/Footer";
 
 export default {
   components: {
     appFooter,
     navbar
   }
-}
+};
 </script>
 
-<style lang="css">
-</style>
+<style lang="css"></style>

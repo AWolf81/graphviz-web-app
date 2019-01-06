@@ -8,16 +8,16 @@ export default {
   data () {
     // console.log('footer', process.env)
     return {
-      version: process.env.version,
+      version: process.env.VUE_APP_VERSION,
       year: (new Date()).getUTCFullYear()
     }
   }
-}
+};
 </script>
 
 <style lang="css">
-  footer {
-    padding-top: 0.5em;
-    padding-right: 0.5em;
-  }
+footer {
+  padding-top: 0.5em;
+  padding-right: 0.5em;
+}
 </style>
