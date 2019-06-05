@@ -27,8 +27,8 @@
 
 <script>
 export default {
-  props: ['show'],
-  data () {
+  props: ["show"],
+  data() {
     return {
       displayModal: this.show
     };
@@ -121,7 +121,7 @@ export default {
   transform: scale(1.1);
 }
 
-@media (max-width:801px)  { 
+@media (max-width:801px)  {
   /* tablet, landscape iPad, lo-res laptops ands desktops */
   /* enlarge modal if screen gets to a smaller size */
   .modal-container {

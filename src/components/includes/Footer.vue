@@ -1,16 +1,15 @@
 <template lang="html">
-  <footer>
-    Version {{version}} - &copy;{{year}} A. Wolf</footer>
+  <footer>Version {{ version }} - &copy;{{ year }} A. Wolf</footer>
 </template>
 
 <script>
 export default {
-  data () {
+  data() {
     // console.log('footer', process.env)
     return {
       version: process.env.VUE_APP_VERSION,
-      year: (new Date()).getUTCFullYear()
-    }
+      year: new Date().getUTCFullYear()
+    };
   }
 };
 </script>

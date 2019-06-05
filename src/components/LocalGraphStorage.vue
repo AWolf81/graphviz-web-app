@@ -5,12 +5,18 @@
       <div class="nano">
         <div class="nano-content">
           <!-- <div class="dropdown-menu"> -->
-            <div :key="index" v-for="(graph, index) in graphs">
-              <div class="media load-item">
-                <h4 class="media-heading">{{graph.name}}</h4>
-                <button class="btn btn-xs" @click="show(graph)">show</button>
-                <button class="btn btn-xs btn-danger" @click="showDeleteConfirm(graph)">delete</button>
-                <div class="media-footer">created at {{formatDate(graph.createdAt)}}</div>
+          <div :key="index" v-for="(graph, index) in graphs">
+            <div class="media load-item">
+              <h4 class="media-heading">{{ graph.name }}</h4>
+              <button class="btn btn-xs" @click="show(graph)">show</button>
+              <button
+                class="btn btn-xs btn-danger"
+                @click="showDeleteConfirm(graph)"
+              >
+                delete
+              </button>
+              <div class="media-footer">
+                created at {{ formatDate(graph.createdAt) }}
               </div>
             </div>
           </div>
@@ -22,12 +28,11 @@
 </template>
 
 <script>
-import {formatDate} from '../helpers/date'
-import {mixin as clickaway} from 'vue-clickaway'
-import dropdown from '@/components/Dropdown.vue'
-import modal from '@/components/Modal.vue'
-import $ from 'jquery'
-import 'nanoscroller'
+import { formatDate } from "../helpers/date";
+import { mixin as clickaway } from "vue-clickaway";
+import dropdown from "@/components/Dropdown.vue";
+import $ from "jquery";
+import "nanoscroller";
 
 export default {
   components: {
@@ -42,7 +47,7 @@ export default {
   props: ["graphs"],
   methods: {
     formatDate,
-    show (graph) {
+    show(graph) {
       if (graph.slug) {
         this.$router.push({
           name: "Home",
@@ -55,7 +60,7 @@ export default {
       }
 
       // below is kept to be backwards compatible
-      if (this.$route.name !== 'Home') {
+      if (this.$route.name !== "Home") {
         // ensure that we're having the correct view
         this.$router.push("/");
       }
@@ -66,10 +71,8 @@ export default {
     showDeleteConfirm(graph) {
       this.$store.commit("showDeleteConfirm", graph);
     },
-    triggerNanoscroller () {
-      setTimeout(() =>
-        $('.nano').nanoScroller({ flash: true })
-      , 50)
+    triggerNanoscroller() {
+      setTimeout(() => $(".nano").nanoScroller({ flash: true }), 50);
     }
   },
   mixins: [clickaway]

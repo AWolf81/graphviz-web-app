@@ -1,31 +1,29 @@
 <template>
-  <div id="app">
-    <router-view :key="$route.path"></router-view>
-  </div>
+  <div id="app"><router-view :key="$route.path"></router-view></div>
 </template>
 
 <script>
-import Vue from 'vue'
+import Vue from "vue";
 
 export default {
-  name: 'app',
-  created () {
+  name: "app",
+  created() {
     // initial load user
-    const token = Vue.ls.get('token')
+    const token = Vue.ls.get("token");
     if (token) {
-      this.$store.dispatch('setHeaders')
-      this.$store.dispatch('fetchUserInfo')
+      this.$store.dispatch("setHeaders");
+      this.$store.dispatch("fetchUserInfo");
     }
   }
-}
+};
 </script>
 
 <style lang="scss">
 $icon-font-path: "~bootstrap-sass/assets/fonts/bootstrap/";
 @import "~bootstrap-sass/assets/stylesheets/_bootstrap.scss";
 @import "~nanoscroller/bin/css/nanoscroller.css";
-$fa-font-path: '~font-awesome/fonts';
-@import '~font-awesome/scss/font-awesome.scss';
+$fa-font-path: "~font-awesome/fonts";
+@import "~font-awesome/scss/font-awesome.scss";
 
 $spacing: 8px; // spacing between render and definition
 

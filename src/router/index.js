@@ -30,12 +30,12 @@ export default new Router({
         {
           path: "/i/privacy",
           name: "Privacy",
-          component: require("../markdown/privacy.md")
+          component: () => import("../markdown/privacy.md")
         },
         {
           path: "/i/terms",
           name: "Terms",
-          component: require("../markdown/terms.md")
+          component: () => import("../markdown/terms.md")
         },
         {
           path: "/example/:index?",

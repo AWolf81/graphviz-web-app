@@ -1,37 +1,39 @@
 import Cosmic from "cosmicjs";
-import pathToRegex from 'path-to-regexp'; 
-import CryptoJS from 'crypto-js';
-import request from 'request-promise';
-import slug from 'slug';
+import pathToRegex from "path-to-regexp";
+import CryptoJS from "crypto-js";
+import request from "request-promise";
+// import slug from "slug";
 
 // import vandium from 'vandium'
 // const vandium = require( 'vandium' );
 
-require('dotenv').config()
+require("dotenv").config();
 
 function createMetaFieldsArray(user, body, visibility) {
   // console.log('metafields', user, body, visibility)
-  return [{
-    title: "Github user",
-    key: "ghUser",
-    value: user,
-    type: "text",
-    required: true
-  },
-  {
-    title: "Body",
-    key: "body",
-    value: body,
-    type: "textarea",
-    required: true
-  },
-  {
-    title: "Visibility",
-    key: "visibility",
-    value: visibility,
-    type: "text",
-    required: true
-  }];
+  return [
+    {
+      title: "Github user",
+      key: "ghUser",
+      value: user,
+      type: "text",
+      required: true
+    },
+    {
+      title: "Body",
+      key: "body",
+      value: body,
+      type: "textarea",
+      required: true
+    },
+    {
+      title: "Visibility",
+      key: "visibility",
+      value: visibility,
+      type: "text",
+      required: true
+    }
+  ];
 }
 
 /* refactoring info
@@ -66,12 +68,12 @@ const writeBucket = api.bucket({
 export async function handler(event, context, callback) {
   // console.log('lambda start', event);
   context.callbackWaitsForEmptyEventLoop = false;
-  console.log('lambda start', context, event);
+  console.log("lambda start", context, event);
 
   const httpMethod = event.httpMethod;
   let user;
   let token;
-  let queryUser
+  let queryUser;
   let slug;
   // let callbackCalled = false // just a test -> UnhandledPromiseRejectionWarning in console even with callbackOnce
 
@@ -87,7 +89,7 @@ export async function handler(event, context, callback) {
 
   function errorHandler(error, statusCode) {
     // console.log('error', error);
-    error = error || new Error('Internal error');
+    error = error || new Error("Internal error");
     statusCode = statusCode || 500;
 
     callback(null, {
@@ -122,7 +124,7 @@ export async function handler(event, context, callback) {
         },
         json: true
       }); // get auth user,
-  
+
       return user;
       // console.log('user response', response, event)
     } catch (error) {
@@ -134,31 +136,39 @@ export async function handler(event, context, callback) {
 
   function filterDotfiles(data) {
     let foundObj;
-
+    console.log("filterdotfiles", data);
     if (slug) {
-      foundObj = data.objects && data.objects.filter(object => object.slug === slug)[0];
+      foundObj =
+        data.objects && data.objects.filter(object => object.slug === slug)[0];
       if (queryUser && queryUser !== (user && user.login)) {
         // query for not owned dotfile:
         // visibility = [username]  // future feature
         // or visibility = public
         // console.log('found', foundObj);
         // console.log('queryUser != login', queryUser, user && user.login, foundObj.metadata && foundObj.metadata.visibility );
-        if (foundObj.metadata && foundObj.metadata.visibility && foundObj.metadata.visibility === 'private') { 
+        if (
+          foundObj.metadata &&
+          foundObj.metadata.visibility &&
+          foundObj.metadata.visibility === "private"
+        ) {
           // console.log('error!', new Error('Access denied!'));
-          errorHandler({error: { message: 'Access denied!'}}, 401); // new Error('Access denied!'));
+          errorHandler({ error: { message: "Access denied!" } }, 401); // new Error('Access denied!'));
           return;
         }
       }
 
       if (foundObj === undefined) {
-        errorHandler({error: { message: 'Url not found'}}, 404);
+        errorHandler({ error: { message: "Url not found" } }, 404);
         return;
       }
 
-       // Decrypt
+      // Decrypt
       try {
-        // console.log('found obj before decrypt', foundObj)
-        const bytes  = CryptoJS.AES.decrypt(foundObj.metadata.body, process.env.CRYPTO_PASSPHRASE);
+        console.log("found obj before decrypt", foundObj);
+        const bytes = CryptoJS.AES.decrypt(
+          foundObj.metadata.body,
+          process.env.CRYPTO_PASSPHRASE
+        );
         const plaintext = bytes.toString(CryptoJS.enc.Utf8);
         foundObj.metadata.body = plaintext; // replace body with decrypted
         // console.log('decrypt', plaintext);
@@ -167,11 +177,10 @@ export async function handler(event, context, callback) {
         // if (metaFieldBody) {
         //   metaFieldBody.value = plaintext;
         // }
-      }
-      catch(err) {
+      } catch (err) {
         // malformed utf-8 error --> returns encrypted plaintext
         // happens if CRYPTO_PASSPHRASE is incorrect
-        errorHandler({error: { message: 'Decryption failed'}}, 500);
+        errorHandler({ error: { message: "Decryption failed" } }, 500);
         return;
       }
     } else {
@@ -182,7 +191,7 @@ export async function handler(event, context, callback) {
         let newObj = obj;
 
         // delete newObj.metafields;
-        delete newObj.metadata.body 
+        delete newObj.metadata.body;
 
         // console.log('newobj', newObj);
 
@@ -194,7 +203,7 @@ export async function handler(event, context, callback) {
 
   function getPathValues() {
     let queryUser, slug;
-    const re = pathToRegex('(.*)/data/:user/:dot');
+    const re = pathToRegex("(.*)/data/:user/:dot");
     const tokens = re.exec(event.path);
 
     if (tokens && tokens.length >= 4) {
@@ -207,19 +216,19 @@ export async function handler(event, context, callback) {
     return {
       queryUser,
       slug
-    }
+    };
   }
 
   async function preCheck() {
     token = event.headers.authorization;
     if (token) {
-      user = await getUser()
+      user = await getUser();
       if (user && user.error) {
         errorHandler(user.error); // error in getUser
-        return;   
+        return;
       }
     }
-    
+
     return true;
   }
   // ================================================
@@ -239,64 +248,71 @@ export async function handler(event, context, callback) {
   const handlers = {
     GET: async () => {
       const data = await readBucket.getObjects({
-        type: 'dotfiles',
+        type: "dotfiles",
         // slug: slug, // --> not supported
         hide_metafields: true,
-        metafield_key: 'ghUser',
+        metafield_key: "ghUser",
         metafield_value: queryUser || (user && user.login),
-        sort: '-modified_at'
+        sort: "-modified_at"
       });
 
       let foundObj = filterDotfiles(data); // also handles decrypt --> check if it's better to separate (OK, for now as we're having it only here)
       if (foundObj === undefined) {
         return;
       }
-      successHandler({dotfiles: foundObj});
+      successHandler({ dotfiles: foundObj });
     },
     POST: async () => {
       let body;
       const eventBody = JSON.parse(event.body);
       // Encrypt
       if (eventBody.body) {
-        const ciphertext = CryptoJS.AES.encrypt(eventBody.body, process.env.CRYPTO_PASSPHRASE);
+        const ciphertext = CryptoJS.AES.encrypt(
+          eventBody.body,
+          process.env.CRYPTO_PASSPHRASE
+        );
         body = ciphertext.toString();
       }
       const title = eventBody.title;
       const visibility = eventBody.visibility;
       slug = eventBody.params.slug;
 
-      console.log('parsed', body, title, slug, user.login)
+      console.log("parsed", body, title, slug, user.login);
       // edit or new graph
       try {
-        let data = {objects: []};
+        let data = { objects: [] };
 
         if (slug) {
           data = await readBucket.getObjects({
-            type_slug: 'dotfiles',
+            type_slug: "dotfiles",
             // slug: slug, // --> not supported - would be a great feature for cosmic.js as combined query slug with metafield
-            metafield_key: 'ghUser',
+            metafield_key: "ghUser",
             metafield_value: user.login
           });
-          
+
           data.objects = data.objects.filter(obj => obj.slug === slug);
         }
 
         // console.log("edit", slug, body, event.body, data.objects.length, user && user.login);
         // console.log('objects', data.objects);
-        const foundTitle = data.objects.length === 1 ? data.objects[0].title : ''
+        const foundTitle =
+          data.objects.length === 1 ? data.objects[0].title : "";
 
-        if (data.objects.length === 0 || (title !== undefined && title !== foundTitle)) {
+        if (
+          data.objects.length === 0 ||
+          (title !== undefined && title !== foundTitle)
+        ) {
           // add new graph - not found or title changed - saveAs
           const params = {
             title,
             content: "", // add description later
             metafields: createMetaFieldsArray(user.login, body, visibility),
-            type_slug: 'dotfiles',
+            type_slug: "dotfiles",
             options: {
               slug_fields: false
             }
           };
-          const {object: newObject} = await writeBucket.addObject(params);
+          const { object: newObject } = await writeBucket.addObject(params);
 
           // console.log('Added object', newObject, newObject.slug);
           successHandler({
@@ -308,14 +324,19 @@ export async function handler(event, context, callback) {
           // one object with slug & user available --> would be great if it would be possible to add user to editObject as well
           // slug is unique for all users that's why it is working
           const metadata = data.objects[0].metadata; // just if we're not changing the data --> default value
-          
-          const response = await writeBucket.editObject({ // possible improvement for Cosmic.js --> just edit the fields that are passed & not replace the whole object
+
+          await writeBucket.editObject({
+            // possible improvement for Cosmic.js --> just edit the fields that are passed & not replace the whole object
             slug: slug,
             title: title || data.objects[0].title,
             options: {
               slug_fields: false
             },
-            metafields: createMetaFieldsArray(eventBody.params.user, body || metadata.body, visibility || metadata.visibility)
+            metafields: createMetaFieldsArray(
+              eventBody.params.user,
+              body || metadata.body,
+              visibility || metadata.visibility
+            )
           });
 
           // console.log("updated", response);
@@ -323,7 +344,7 @@ export async function handler(event, context, callback) {
             msg: "Successfully updated"
           });
         }
-      } catch ({error}) {
+      } catch ({ error }) {
         errorHandler(error);
       }
     },
@@ -332,30 +353,30 @@ export async function handler(event, context, callback) {
       // const eventBody = JSON.parse(event.body);
       // slug = eventBody.slug;
 
-      console.log('delete', slug)
+      console.log("delete", slug);
       if (user.login !== queryUser) {
-        errorHandler({error: 'Only owner can delete'}, 401);
+        errorHandler({ error: "Only owner can delete" }, 401);
         return;
       }
 
       try {
         await writeBucket.deleteObject({
           slug
-        })
-        successHandler({msg: 'Object deleted', slug});
-      } catch(error) {
+        });
+        successHandler({ msg: "Object deleted", slug });
+      } catch (error) {
         errorHandler(error);
       }
     }
-  }
-  
+  };
+
   // console.log('about to handle httpMethod', httpMethod);
   if (Object.keys(handlers).indexOf(httpMethod) !== -1) {
     await handlers[httpMethod]();
   } else {
-    errorHandler({error: 'Not handled: ' + httpMethod}, 404);
+    errorHandler({ error: "Not handled: " + httpMethod }, 404);
   }
 
-  console.log('exiting');
+  console.log("exiting");
   // callback(null)
 }

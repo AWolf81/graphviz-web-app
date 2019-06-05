@@ -4,9 +4,7 @@
     <navbar></navbar>
 
     <div class="container-fluid">
-      <div class="row">
-        <router-view class="col-sm-12"></router-view>
-      </div>
+      <div class="row"><router-view class="col-sm-12"></router-view></div>
     </div>
     <app-footer></app-footer>
   </div>

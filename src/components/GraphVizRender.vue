@@ -36,7 +36,7 @@ export default {
         }
       } catch (err) {
         // render error to label later
-        this.$emit('error', err.message)
+        this.$emit("error", err.message);
       }
     }
   }
