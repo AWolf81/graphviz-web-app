@@ -1,0 +1,104 @@
+{
+  "name": "draw-viz-app",
+  "version": "0.1.11",
+  "description": "Graphviz editor & rendering app with live updating.",
+  "author": "AWolf81 <awolf2904@gmail.com>",
+  "private": true,
+  "scripts": {
+    "start": "run-p serve lambda",
+    "serve": "vue-cli-service serve",
+    "build": "vue-cli-service build",
+    "build:lambda": "netlify-lambda build src/lambda",
+    "lint": "vue-cli-service lint",
+    "test:unit": "vue-cli-service test:unit",
+    "predeploy": "yarn build",
+    "deploy": "surge --domain https://drawviz.surge.sh",
+    "lambda": "cross-env NODE_ENV=development netlify-lambda serve src/lambda",
+    "debug:lambda": "npx --node-arg=--inspect-brk=9229 cross-env NODE_ENV=development netlify-lambda serve src/lambda"
+  },
+  "dependencies": {
+    "@middy/http-error-handler": "1.0.0-alpha.33",
+    "@sanity/client": "^0.140.32",
+    "@sharecover-co/middy-http-response-serializer": "0.1.0",
+    "animate.css": "3.6.1",
+    "axios": "0.19.0",
+    "bootstrap-sass": "3.4.1",
+    "bulma": "0.7.2",
+    "codemirror": "5.42.2",
+    "core-js": "^2.6.5",
+    "crypto-js": "3.1.9-1",
+    "font-awesome": "4.7.0",
+    "hammerjs": "2.0.8",
+    "headroom.js": "0.9.4",
+    "http-errors": "1.7.2",
+    "jquery": "3.4.0",
+    "jquery-resizable": "1.0.6",
+    "kitsu-core": "7.0.3",
+    "lodash": "4.17.11",
+    "middy": "^0.28.5",
+    "middy-extractor": "1.0.0",
+    "middy-jsonapi": "0.2.3",
+    "moment": "2.21.0",
+    "nanoscroller": "0.8.7",
+    "netlify-auth-providers": "1.0.0-alpha5",
+    "netlify-lambda": "0.4.0",
+    "node-sass": "4.7.2",
+    "register-service-worker": "1.5.2",
+    "request-promise": "4.2.2",
+    "sass-loader": "7.1.0",
+    "save-svg-as-png": "1.3.1",
+    "slug": "0.9.1",
+    "spinkit": "1.2.5",
+    "svg-pan-zoom": "github:ariutta/svg-pan-zoom",
+    "viz.js": "2.1.2",
+    "vue": "^2.6.10",
+    "vue-bootstrap-modal": "0.1.13",
+    "vue-clickaway": "2.1.0",
+    "vue-codemirror": "4.0.6",
+    "vue-ls": "3.2.0",
+    "vue-multipane": "0.9.5",
+    "vue-resize-handle": "1.0.0",
+    "vue-router": "3.0.1",
+    "vue-social-sharing": "2.3.3",
+    "vuex": "3.0.1"
+  },
+  "devDependencies": {
+    "@vue/cli": "*",
+    "@vue/cli-plugin-babel": "^3.10.0",
+    "@vue/cli-plugin-eslint": "^3.10.0",
+    "@vue/cli-service": "^3.10.0",
+    "babel-eslint": "^10.0.1",
+    "cross-env": "5.2.0",
+    "dotenv": "6.2.0",
+    "eslint": "^5.16.0",
+    "eslint-plugin-vue": "^5.0.0",
+    "npm-run-all": "^4.1.5",
+    "raw-loader": "^3.1.0",
+    "surge": "0.20.1",
+    "vue-markdown-loader": "2.4.1",
+    "vue-template-compiler": "^2.6.10"
+  },
+  "eslintConfig": {
+    "root": true,
+    "env": {
+      "node": true
+    },
+    "extends": [
+      "plugin:vue/essential",
+      "eslint:recommended"
+    ],
+    "rules": {},
+    "parserOptions": {
+      "parser": "babel-eslint"
+    }
+  },
+  "postcss": {
+    "plugins": {
+      "autoprefixer": {}
+    }
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions"
+  ]
+}
