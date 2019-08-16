@@ -8,8 +8,7 @@
     "packages": [
       "web",
       "sanitystudio"
-    ],
-    "nohoist": ["**/middy/**"]
+    ]
   },
   "dependencies": {},
   "devDependencies": {},
