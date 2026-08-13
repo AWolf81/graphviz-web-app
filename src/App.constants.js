@@ -5,7 +5,7 @@ export const examples = [
     id: 0,
     caption: "Simple",
     data: `digraph G {
-  ## Comment with double hash char
+  // Comment with double hash char
   Hello->World
 }`
   },
@@ -53,7 +53,7 @@ export const examples = [
     id: 5,
     caption: "Grouped",
     data: `digraph {
-  ## example grouped (a goes to b & d, b&d result in c)
+  // example grouped (a goes to b & d, b&d result in c)
   a-> {
     b,
     d
