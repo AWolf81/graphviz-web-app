@@ -17,11 +17,11 @@ export default new Vuex.Store({
     dotData:
       Vue.ls.get("draftDot") ||
       `digraph {
-      node [shape=box]; ## changes all nodes
-      a [shape=doublecircle]; ## changes only a
-      ## a to b with -> as the connection
+      node [shape=box]; // changes all nodes
+      a [shape=doublecircle]; // changes only a
+      // a to b with -> as the connection
       a -> b;
-      ## b to c and back to a
+      // b to c and back to a
       b -> c -> a;
     }`,
     graphToDelete: undefined,
